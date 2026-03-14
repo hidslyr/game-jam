@@ -11,7 +11,41 @@ public class LevelData : ScriptableObject
     public int LevelNumber = 1;
     public string LevelName = "Level 1";
 
-    [Header("Gameplay Config")]
-    [Tooltip("Extend with level-specific settings as needed")]
-    public float TimeLimitSeconds = 120f;
+    [Header("Puzzle Pieces (ordered, clear left to right)")]
+    public PieceEntry[] PuzzlePieces;
+
+    [Header("Basket Grid (rows, index 0 = top row)")]
+    public GridRow[] GridRows;
+
+    [Header("Staging Slots")]
+    public int SlotCount = 5;
+}
+
+/// <summary>
+/// A single puzzle piece: color + amount to fill.
+/// </summary>
+[System.Serializable]
+public struct PieceEntry
+{
+    public GameColor Color;
+    public int Amount;
+}
+
+/// <summary>
+/// A single basket: color + amount it holds.
+/// </summary>
+[System.Serializable]
+public struct BasketEntry
+{
+    public GameColor Color;
+    public int Amount;
+}
+
+/// <summary>
+/// One row of baskets in the grid.
+/// </summary>
+[System.Serializable]
+public struct GridRow
+{
+    public BasketEntry[] Baskets;
 }

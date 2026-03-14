@@ -14,4 +14,27 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LevelData
   LevelNumber: 1
   LevelName: Level 1
-  TimeLimitSeconds: 120
+  PuzzlePieces:
+  - Color: 1
+    Amount: 6
+  - Color: 0
+    Amount: 6
+  - Color: 2
+    Amount: 6
+  GridRows:
+  - Baskets:
+    - Color: 1
+      Amount: 2
+    - Color: 1
+      Amount: 2
+    - Color: 1
+      Amount: 2
+  - Baskets:
+    - Color: 0
+      Amount: 4
+    - Color: 0
+      Amount: 2
+  - Baskets:
+    - Color: 2
+      Amount: 6
+  SlotCount: 5
