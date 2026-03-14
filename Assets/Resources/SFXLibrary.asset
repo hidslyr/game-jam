@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b89b981227f6c4ffab80e9bd6224ebb8, type: 3}
   m_Name: SFXLibrary
   m_EditorClassIdentifier: Assembly-CSharp::SFXLibrary
-  PieceClear: {fileID: 8300000, guid: 0e43c3776e4a547768d062300a526ea3, type: 3}
-  PieceFill: {fileID: 8300000, guid: 0e43c3776e4a547768d062300a526ea3, type: 3}
-  BasketPick: {fileID: 8300000, guid: 0e43c3776e4a547768d062300a526ea3, type: 3}
-  BasketEmpty: {fileID: 8300000, guid: 0e43c3776e4a547768d062300a526ea3, type: 3}
+  PieceClear: {fileID: 8300000, guid: 92b10904426a131428378c89568e228f, type: 3}
+  PieceFill: {fileID: 8300000, guid: 5c96958d4b2ecb8448654bab2e29f50e, type: 3}
+  BasketPick: {fileID: 8300000, guid: 064d1725d7b43c04c954c2e9fb7e6a58, type: 3}
+  BasketEmpty: {fileID: 0}
   Win: {fileID: 0}
   Lose: {fileID: 0}
