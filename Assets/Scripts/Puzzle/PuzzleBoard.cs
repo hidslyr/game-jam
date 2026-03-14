@@ -161,6 +161,9 @@ public class PuzzleBoard : MonoBehaviour
             int slotAmount = stagingSlots.GetSlotAmount(matchIdx);
             int leftover = piece.Fill(slotAmount);
 
+            // Update debug UI
+            MainUI.Instance?.UpdateDebugPiece(currentPieceIndex, piece.RemainingAmount, piece.IsCleared);
+
             // Always re-check after any fill operation
             changed = true;
 
