@@ -213,7 +213,7 @@ public class PuzzleBoard : MonoBehaviour
         if (allCleared)
         {
             Debug.Log("[PuzzleBoard] WIN — all pieces cleared!");
-            GameManager.Instance?.TriggerWin();
+            StartCoroutine(DelayedEndScreen(true));
             return;
         }
 
@@ -225,11 +225,20 @@ public class PuzzleBoard : MonoBehaviour
             if (match == -1)
             {
                 Debug.Log("[PuzzleBoard] LOSE — all slots full, no match!");
-                GameManager.Instance?.TriggerLose();
+                StartCoroutine(DelayedEndScreen(false));
             }
         }
     }
 
+    IEnumerator DelayedEndScreen(bool isWin)
+    {
+        yield return new WaitForSeconds(5f);
+
+        if (isWin)
+            GameManager.Instance?.TriggerWin();
+        else
+            GameManager.Instance?.TriggerLose();
+    }
     /// <summary>
     /// Returns the current active piece (used by FlexiblePipe).
     /// </summary>
