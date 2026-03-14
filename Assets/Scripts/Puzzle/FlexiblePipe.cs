@@ -75,7 +75,16 @@ public class FlexiblePipe : MonoBehaviour
             piecePositions.Add(cp != null ? cp.position : pieces[i].transform.position);
         }
 
-        // Create skeleton segments (piece[i] → piece[i+1])
+        // Look for EndPoint under pieces root
+        var piecesRoot = pieces[0].transform.parent;
+        if (piecesRoot != null)
+        {
+            var endPoint = piecesRoot.Find("EndPoint");
+            if (endPoint != null)
+                piecePositions.Add(endPoint.position);
+        }
+
+        // Create skeleton segments (piece[i] → piece[i+1], including EndPoint)
         for (int i = 1; i < piecePositions.Count - 1; i++)
         {
             var lr = CreateLineRenderer($"Skeleton_{i}");
@@ -121,23 +130,34 @@ public class FlexiblePipe : MonoBehaviour
         return StartCoroutine(PumpCoroutine());
     }
 
+    // Wrapper so each pump has a stable reference
+    class PumpEntry { public float progress; }
+
     IEnumerator PumpCoroutine()
     {
-        int pumpIndex = activePumps.Count;
+        var entry = new PumpEntry { progress = 0f };
         activePumps.Add(0f);
+        int entryIndex = activePumps.Count - 1;
 
         float elapsed = 0f;
         while (elapsed < PumpDuration)
         {
             elapsed += Time.deltaTime;
-            if (pumpIndex < activePumps.Count)
-                activePumps[pumpIndex] = Mathf.Clamp01(elapsed / PumpDuration);
+            float p = Mathf.Clamp01(elapsed / PumpDuration);
+
+            // Update our entry — find it by checking we're still in range
+            if (entryIndex < activePumps.Count)
+                activePumps[entryIndex] = p;
+
             yield return null;
         }
 
-        // Remove this pump
-        if (pumpIndex < activePumps.Count)
-            activePumps.RemoveAt(pumpIndex);
+        // Remove by setting to a sentinel, then clean up
+        if (entryIndex < activePumps.Count)
+            activePumps[entryIndex] = -1f;
+
+        // Remove all completed pumps (sentinel = -1)
+        activePumps.RemoveAll(v => v < 0f || v >= 1f);
     }
 
     // ────── Rendering ──────
@@ -191,12 +211,14 @@ public class FlexiblePipe : MonoBehaviour
                 if (withPump && activePumps.Count > 0 && totalPumpSegments > 0)
                 {
                     float pumpT = ((segmentOffset + seg) + localT) / totalPumpSegments;
+                    float totalBulge = 0f;
                     for (int p = 0; p < activePumps.Count; p++)
                     {
                         float dist = Mathf.Abs(pumpT - activePumps[p]);
                         float bulge = Mathf.Exp(-(dist * dist) / (2f * PumpBulgeWidth * PumpBulgeWidth));
-                        width += PipeWidth * (PumpBulgeMultiplier - 1f) * bulge;
+                        totalBulge = Mathf.Max(totalBulge, bulge);
                     }
+                    width += PipeWidth * (PumpBulgeMultiplier - 1f) * totalBulge;
                 }
                 widthCurve.AddKey(globalT, width);
 
@@ -241,12 +263,14 @@ public class FlexiblePipe : MonoBehaviour
                 if (pumpThrough && activePumps.Count > 0 && totalPumpSegments > 0)
                 {
                     float pumpT = (pumpSegIndex + t) / totalPumpSegments;
+                    float totalBulge = 0f;
                     for (int p = 0; p < activePumps.Count; p++)
                     {
                         float dist = Mathf.Abs(pumpT - activePumps[p]);
                         float bulge = Mathf.Exp(-(dist * dist) / (2f * PumpBulgeWidth * PumpBulgeWidth));
-                        width += PipeWidth * (PumpBulgeMultiplier - 1f) * bulge;
+                        totalBulge = Mathf.Max(totalBulge, bulge);
                     }
+                    width += PipeWidth * (PumpBulgeMultiplier - 1f) * totalBulge;
                 }
                 widthCurve.AddKey(t, width);
             }
@@ -268,12 +292,14 @@ public class FlexiblePipe : MonoBehaviour
                     float t = (float)i;
                     float pumpT = (pumpSegIndex + t) / totalPumpSegments;
                     float width = PipeWidth;
+                    float totalBulge = 0f;
                     for (int p = 0; p < activePumps.Count; p++)
                     {
                         float dist = Mathf.Abs(pumpT - activePumps[p]);
                         float bulge = Mathf.Exp(-(dist * dist) / (2f * PumpBulgeWidth * PumpBulgeWidth));
-                        width += PipeWidth * (PumpBulgeMultiplier - 1f) * bulge;
+                        totalBulge = Mathf.Max(totalBulge, bulge);
                     }
+                    width += PipeWidth * (PumpBulgeMultiplier - 1f) * totalBulge;
                     widthCurve.AddKey(t, width);
                 }
                 lr.widthCurve = widthCurve;
@@ -307,6 +333,8 @@ public class FlexiblePipe : MonoBehaviour
             lr.material = PipeMaterial;
         else
             lr.material = new Material(Shader.Find("Sprites/Default"));
+
+        lr.sortingOrder = -10;
 
         return lr;
     }

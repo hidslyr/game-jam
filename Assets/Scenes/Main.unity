@@ -3486,8 +3486,8 @@ Camera:
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 45
-  orthographic: 0
-  orthographic size: 5
+  orthographic: 1
+  orthographic size: 7.66
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -3757,9 +3757,9 @@ MonoBehaviour:
   PipeWidth: 0.15
   PipeMaterial: {fileID: 2100000, guid: 2c8affae331d41e4791fa8ffcf295667, type: 2}
   PipeColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
-  PumpDuration: 0.6
-  PumpBulgeMultiplier: 2
-  PumpBulgeWidth: 0.09
+  PumpDuration: 0.4
+  PumpBulgeMultiplier: 1.36
+  PumpBulgeWidth: 0.15
 --- !u!4 &1957048563
 Transform:
   m_ObjectHideFlags: 0
