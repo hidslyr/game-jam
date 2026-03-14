@@ -155,43 +155,30 @@ public class PuzzleBoard : MonoBehaviour
                 continue;
             }
 
-            // Find matching basket in staging slots
-            int matchIdx = stagingSlots.FindMatchingSlot(piece.Color);
-            if (matchIdx == -1) break; // No match — done for now
+            // Find ALL matching baskets in staging slots
+            var matchIndices = stagingSlots.FindAllMatchingSlots(piece.Color);
+            if (matchIndices.Count == 0) break; // No match — done for now
 
-            int slotAmount = stagingSlots.GetSlotAmount(matchIdx);
+            // Wait for fly-in animation
+            yield return new WaitForSeconds(stagingSlots.FlyInDuration * 0.5f);
 
-            // Move basket from slot to BasketFillingPoint
-            var basketGo = stagingSlots.MoveBasketToFillingPoint(matchIdx);
-            if (basketGo == null) break;
+            // Start parallel pump + fill for all matching baskets
+            int fillCount = 0;
+            int totalFills = matchIndices.Count;
 
-            // Wait for jump animation
-            yield return new WaitForSeconds(stagingSlots.FillingJumpDuration);
+            for (int m = 0; m < matchIndices.Count; m++)
+            {
+                int slotIdx = matchIndices[m];
+                int slotAmount = stagingSlots.GetSlotAmount(slotIdx);
+                StartCoroutine(FillFromSlot(piece, slotIdx, slotAmount, () => fillCount++));
+            }
 
-            // Short delay before filling
-            yield return new WaitForSeconds(stagingSlots.FillDelay);
-
-            // Play pump animation through pipe
-            if (flexiblePipe != null)
-                yield return flexiblePipe.PlayPump();
-
-            // Fill the piece (BlendShape updates after pump finishes)
-            int leftover = piece.Fill(slotAmount);
+            // Wait for all parallel fills to finish
+            while (fillCount < totalFills)
+                yield return null;
 
             // Update debug UI
             MainUI.Instance?.UpdateDebugPiece(currentPieceIndex, piece.RemainingAmount, piece.IsCleared);
-
-            // Basket always destroyed after filling (fully consumed or leftover)
-            GameManager.Instance?.PlayBasketEmptySFX();
-            Destroy(basketGo);
-
-            if (leftover > 0 && !piece.IsCleared)
-            {
-                // Leftover but piece not cleared — LOSE
-                Debug.Log("[PuzzleBoard] LOSE — basket has leftover but can't fill piece!");
-                GameManager.Instance?.TriggerLose();
-                yield break;
-            }
 
             if (piece.IsCleared)
             {
@@ -207,6 +194,37 @@ public class PuzzleBoard : MonoBehaviour
 
         // Check win/lose after cascade finishes
         CheckWinLose();
+    }
+
+    IEnumerator FillFromSlot(PuzzlePiece piece, int slotIdx, int amount, System.Action onDone)
+    {
+        // Fire "pump" trigger on basket's child Animator
+        var basketGo = stagingSlots.GetSlotVisual(slotIdx);
+        if (basketGo != null)
+        {
+            var animator = basketGo.GetComponentInChildren<Animator>();
+            if (animator != null)
+                animator.SetTrigger("pump");
+        }
+
+        // Play pump animation through pipe
+        if (flexiblePipe != null)
+            yield return flexiblePipe.PlayPump();
+
+        // Fill the piece
+        int leftover = piece.Fill(amount);
+
+        // Destroy basket in staging slot
+        GameManager.Instance?.PlayBasketEmptySFX();
+        stagingSlots.ClearSlot(slotIdx);
+
+        if (leftover > 0 && !piece.IsCleared)
+        {
+            Debug.Log("[PuzzleBoard] LOSE — basket has leftover but can't fill piece!");
+            GameManager.Instance?.TriggerLose();
+        }
+
+        onDone?.Invoke();
     }
 
     void CheckWinLose()

@@ -11,8 +11,6 @@ public class StagingSlots : MonoBehaviour
     [Header("Slot Layout")]
     public float SlotSpacingX = 1.2f;
     public float FlyInDuration = 0.5f;
-    public float FillingJumpDuration = 0.3f;
-    public float FillDelay = 0.2f;
 
     [Header("Prefab")]
     public GameObject SlotPrefab; // Visual slot outline
@@ -21,7 +19,6 @@ public class StagingSlots : MonoBehaviour
     SlotData[] slots;
     Transform[] slotTransforms;
     Transform anchorPoint;
-    Transform fillingPoint;
 
     struct SlotData
     {
@@ -40,10 +37,6 @@ public class StagingSlots : MonoBehaviour
         // Find AnchorPoint child as slot origin
         var anchor = transform.Find("AnchorPoint");
         anchorPoint = anchor != null ? anchor : transform;
-
-        // Find BasketFillingPoint
-        var fp = transform.Find("BasketFillingPoint");
-        fillingPoint = fp != null ? fp : transform;
 
         // Spawn slot outlines
         for (int i = 0; i < slotCount; i++)
@@ -95,29 +88,6 @@ public class StagingSlots : MonoBehaviour
     }
 
     /// <summary>
-    /// Animate a basket from its slot to the BasketFillingPoint.
-    /// Returns the basket GO. Slot is cleared after move.
-    /// </summary>
-    public GameObject MoveBasketToFillingPoint(int idx)
-    {
-        if (idx < 0 || idx >= slotCount) return null;
-        if (!slots[idx].Filled) return null;
-
-        var basketGo = slots[idx].Visual;
-        if (basketGo == null) return null;
-
-        // Detach from slot data (slot becomes empty)
-        slots[idx].Visual = null;
-        slots[idx] = default;
-
-        // Animate to filling point
-        var targetPos = fillingPoint.position;
-        basketGo.transform.DOMove(targetPos, FillingJumpDuration).SetEase(Ease.OutBack);
-
-        return basketGo;
-    }
-
-    /// <summary>
     /// Update the amount on a slot (basket partially consumed).
     /// </summary>
     public void UpdateSlotAmount(int idx, int newAmount)
@@ -146,9 +116,24 @@ public class StagingSlots : MonoBehaviour
         return -1;
     }
 
+    /// <summary>
+    /// Find ALL slots matching the given color. Returns list of indices.
+    /// </summary>
+    public System.Collections.Generic.List<int> FindAllMatchingSlots(GameColor color)
+    {
+        var result = new System.Collections.Generic.List<int>();
+        for (int i = 0; i < slotCount; i++)
+        {
+            if (slots[i].Filled && slots[i].Color == color)
+                result.Add(i);
+        }
+        return result;
+    }
+
     public GameColor GetSlotColor(int idx) => slots[idx].Color;
     public int GetSlotAmount(int idx) => slots[idx].Amount;
     public bool IsSlotFilled(int idx) => slots[idx].Filled;
+    public GameObject GetSlotVisual(int idx) => (idx >= 0 && idx < slotCount) ? slots[idx].Visual : null;
 
     public bool IsFull()
     {

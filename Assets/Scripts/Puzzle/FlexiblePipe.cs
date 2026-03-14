@@ -43,10 +43,9 @@ public class FlexiblePipe : MonoBehaviour
     List<Vector3> piecePositions = new List<Vector3>();
     int clearedCount = 0;
 
-    // Pump state
-    bool isPumping;
-    float pumpProgress;
-    public bool IsPumping => isPumping;
+    // Pump state — multiple simultaneous pumps
+    List<float> activePumps = new List<float>();
+    public bool IsPumping => activePumps.Count > 0;
 
     void Awake()
     {
@@ -99,7 +98,7 @@ public class FlexiblePipe : MonoBehaviour
         for (int i = 0; i < skeletonSegments.Count; i++)
         {
             int segStartPieceIdx = i + 1;
-            bool pumpThrough = isPumping && segStartPieceIdx <= clearedCount;
+            bool pumpThrough = activePumps.Count > 0 && segStartPieceIdx <= clearedCount;
 
             UpdateSingleSegment(skeletonSegments[i], piecePositions[segStartPieceIdx],
                 piecePositions[segStartPieceIdx + 1], time, i, pumpThrough, segStartPieceIdx);
@@ -124,19 +123,21 @@ public class FlexiblePipe : MonoBehaviour
 
     IEnumerator PumpCoroutine()
     {
-        isPumping = true;
-        pumpProgress = 0f;
+        int pumpIndex = activePumps.Count;
+        activePumps.Add(0f);
 
         float elapsed = 0f;
         while (elapsed < PumpDuration)
         {
             elapsed += Time.deltaTime;
-            pumpProgress = Mathf.Clamp01(elapsed / PumpDuration);
+            if (pumpIndex < activePumps.Count)
+                activePumps[pumpIndex] = Mathf.Clamp01(elapsed / PumpDuration);
             yield return null;
         }
 
-        pumpProgress = 0f;
-        isPumping = false;
+        // Remove this pump
+        if (pumpIndex < activePumps.Count)
+            activePumps.RemoveAt(pumpIndex);
     }
 
     // ────── Rendering ──────
@@ -187,13 +188,15 @@ public class FlexiblePipe : MonoBehaviour
                 lr.SetPosition(pointIdx, point);
 
                 float width = PipeWidth;
-                if (withPump && isPumping && totalPumpSegments > 0)
+                if (withPump && activePumps.Count > 0 && totalPumpSegments > 0)
                 {
-                    // Map local progress to global pump path
                     float pumpT = ((segmentOffset + seg) + localT) / totalPumpSegments;
-                    float dist = Mathf.Abs(pumpT - pumpProgress);
-                    float bulge = Mathf.Exp(-(dist * dist) / (2f * PumpBulgeWidth * PumpBulgeWidth));
-                    width += PipeWidth * (PumpBulgeMultiplier - 1f) * bulge;
+                    for (int p = 0; p < activePumps.Count; p++)
+                    {
+                        float dist = Mathf.Abs(pumpT - activePumps[p]);
+                        float bulge = Mathf.Exp(-(dist * dist) / (2f * PumpBulgeWidth * PumpBulgeWidth));
+                        width += PipeWidth * (PumpBulgeMultiplier - 1f) * bulge;
+                    }
                 }
                 widthCurve.AddKey(globalT, width);
 
@@ -235,12 +238,15 @@ public class FlexiblePipe : MonoBehaviour
                 lr.SetPosition(i, point);
 
                 float width = PipeWidth;
-                if (pumpThrough && isPumping && totalPumpSegments > 0)
+                if (pumpThrough && activePumps.Count > 0 && totalPumpSegments > 0)
                 {
                     float pumpT = (pumpSegIndex + t) / totalPumpSegments;
-                    float dist = Mathf.Abs(pumpT - pumpProgress);
-                    float bulge = Mathf.Exp(-(dist * dist) / (2f * PumpBulgeWidth * PumpBulgeWidth));
-                    width += PipeWidth * (PumpBulgeMultiplier - 1f) * bulge;
+                    for (int p = 0; p < activePumps.Count; p++)
+                    {
+                        float dist = Mathf.Abs(pumpT - activePumps[p]);
+                        float bulge = Mathf.Exp(-(dist * dist) / (2f * PumpBulgeWidth * PumpBulgeWidth));
+                        width += PipeWidth * (PumpBulgeMultiplier - 1f) * bulge;
+                    }
                 }
                 widthCurve.AddKey(t, width);
             }
@@ -253,7 +259,7 @@ public class FlexiblePipe : MonoBehaviour
             lr.SetPosition(0, start);
             lr.SetPosition(1, end);
 
-            if (pumpThrough && isPumping)
+            if (pumpThrough && activePumps.Count > 0)
             {
                 int totalPumpSegments = 1 + clearedCount;
                 var widthCurve = new AnimationCurve();
@@ -261,9 +267,13 @@ public class FlexiblePipe : MonoBehaviour
                 {
                     float t = (float)i;
                     float pumpT = (pumpSegIndex + t) / totalPumpSegments;
-                    float dist = Mathf.Abs(pumpT - pumpProgress);
-                    float bulge = Mathf.Exp(-(dist * dist) / (2f * PumpBulgeWidth * PumpBulgeWidth));
-                    float width = PipeWidth + PipeWidth * (PumpBulgeMultiplier - 1f) * bulge;
+                    float width = PipeWidth;
+                    for (int p = 0; p < activePumps.Count; p++)
+                    {
+                        float dist = Mathf.Abs(pumpT - activePumps[p]);
+                        float bulge = Mathf.Exp(-(dist * dist) / (2f * PumpBulgeWidth * PumpBulgeWidth));
+                        width += PipeWidth * (PumpBulgeMultiplier - 1f) * bulge;
+                    }
                     widthCurve.AddKey(t, width);
                 }
                 lr.widthCurve = widthCurve;
