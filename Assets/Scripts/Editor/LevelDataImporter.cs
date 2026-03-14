@@ -190,6 +190,8 @@ public class LevelDataImporter : Editor
             case "R": color = GameColor.Red; break;
             case "G": color = GameColor.Green; break;
             case "B": color = GameColor.Blue; break;
+            case "Y": color = GameColor.Yellow; break;
+            case "P": color = GameColor.Purple; break;
             default: return null;
         }
 

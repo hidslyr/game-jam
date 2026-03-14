@@ -7,7 +7,9 @@ public enum GameColor
 {
     Red,
     Green,
-    Blue
+    Blue,
+    Yellow,
+    Purple
 }
 
 /// <summary>
@@ -22,10 +24,12 @@ public static class GameColorExtensions
     {
         switch (gc)
         {
-            case GameColor.Red:   return new Color(0.91f, 0.27f, 0.37f); // #E94560
-            case GameColor.Green: return new Color(0.06f, 0.61f, 0.35f); // #0F9B58
-            case GameColor.Blue:  return new Color(0.26f, 0.52f, 0.96f); // #4285F4
-            default:              return Color.white;
+            case GameColor.Red:    return new Color(0.91f, 0.27f, 0.37f); // #E94560
+            case GameColor.Green:  return new Color(0.06f, 0.61f, 0.35f); // #0F9B58
+            case GameColor.Blue:   return new Color(0.26f, 0.52f, 0.96f); // #4285F4
+            case GameColor.Yellow: return new Color(0.98f, 0.74f, 0.18f); // #FABD2F
+            case GameColor.Purple: return new Color(0.69f, 0.35f, 0.87f); // #B05ADE
+            default:               return Color.white;
         }
     }
 }

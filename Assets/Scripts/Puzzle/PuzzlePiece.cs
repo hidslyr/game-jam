@@ -122,10 +122,12 @@ public class PuzzlePiece : MonoBehaviour
         string matName;
         switch (color)
         {
-            case GameColor.Red:   matName = "mat_Balloon_red"; break;
-            case GameColor.Green: matName = "mat_Balloon_green"; break;
-            case GameColor.Blue:  matName = "mat_Balloon_blue"; break;
-            default:              matName = "mat_Balloon_base"; break;
+            case GameColor.Red:    matName = "mat_Balloon_red"; break;
+            case GameColor.Green:  matName = "mat_Balloon_green"; break;
+            case GameColor.Blue:   matName = "mat_Balloon_blue"; break;
+            case GameColor.Yellow: matName = "mat_Balloon_yellow"; break;
+            case GameColor.Purple: matName = "mat_Balloon_purple"; break;
+            default:               matName = "mat_Balloon_base"; break;
         }
 
         // Materials under Assets/Resources/GameJam/Art/Balloon/
