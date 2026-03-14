@@ -11,9 +11,6 @@ public class PuzzleBoard : MonoBehaviour
 {
     public static PuzzleBoard Instance { get; private set; }
 
-    [Header("Prefabs (assign in Inspector or load from Resources)")]
-    public PuzzlePiece PiecePrefab;
-
     [Header("Piece Layout")]
     public float PieceSpacingX = 1.4f;
 
@@ -25,6 +22,7 @@ public class PuzzleBoard : MonoBehaviour
     // Runtime state
     List<PuzzlePiece> pieces = new List<PuzzlePiece>();
     int currentPieceIndex = 0;
+    GameObject pieceChainInstance; // The instantiated level chain prefab
 
     void Awake()
     {
@@ -57,17 +55,34 @@ public class PuzzleBoard : MonoBehaviour
         // Clear previous
         ClearAll();
 
-        // Spawn puzzle pieces
-        if (data.PuzzlePieces != null)
+        // Load and instantiate the level's piece chain prefab
+        int levelNum = data.LevelNumber;
+        var chainPrefab = Resources.Load<GameObject>($"Prefabs/PieceLv{levelNum}");
+        if (chainPrefab == null)
         {
-            for (int i = 0; i < data.PuzzlePieces.Length; i++)
-            {
-                var entry = data.PuzzlePieces[i];
-                var piece = Instantiate(PiecePrefab, puzzleChainParent != null ? puzzleChainParent : transform);
-                piece.transform.localPosition = new Vector3(i * PieceSpacingX, 0f, 0f);
-                piece.Initialize(entry.Color, entry.Amount);
-                pieces.Add(piece);
-            }
+            Debug.LogError($"[PuzzleBoard] Prefab not found: Resources/Prefabs/PieceLv{levelNum}");
+            return;
+        }
+
+        pieceChainInstance = Instantiate(chainPrefab, puzzleChainParent != null ? puzzleChainParent : transform);
+        pieceChainInstance.transform.localPosition = Vector3.zero;
+
+        // Find all PuzzlePiece children, sorted by GO name as int (1, 2, 3...)
+        var foundPieces = pieceChainInstance.GetComponentsInChildren<PuzzlePiece>();
+        var sortedPieces = new List<PuzzlePiece>(foundPieces);
+        sortedPieces.Sort((a, b) =>
+        {
+            int.TryParse(a.gameObject.name, out int idxA);
+            int.TryParse(b.gameObject.name, out int idxB);
+            return idxA.CompareTo(idxB);
+        });
+
+        // Initialize each piece with LevelData color + amount
+        for (int i = 0; i < sortedPieces.Count && i < data.PuzzlePieces.Length; i++)
+        {
+            var entry = data.PuzzlePieces[i];
+            sortedPieces[i].Initialize(entry.Color, entry.Amount);
+            pieces.Add(sortedPieces[i]);
         }
 
         // Initialize basket grid
@@ -82,7 +97,7 @@ public class PuzzleBoard : MonoBehaviour
         currentPieceIndex = 0;
         UpdateActivePiece();
 
-        Debug.Log($"[PuzzleBoard] Initialized: {pieces.Count} pieces, slotCount={data.SlotCount}");
+        Debug.Log($"[PuzzleBoard] Initialized: {pieces.Count} pieces from PieceLv{levelNum}, slotCount={data.SlotCount}");
     }
 
     /// <summary>
@@ -217,8 +232,9 @@ public class PuzzleBoard : MonoBehaviour
 
     void ClearAll()
     {
-        foreach (var p in pieces)
-            if (p != null) Destroy(p.gameObject);
+        if (pieceChainInstance != null)
+            Destroy(pieceChainInstance);
+
         pieces.Clear();
         currentPieceIndex = 0;
     }

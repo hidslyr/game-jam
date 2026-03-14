@@ -1,37 +1,81 @@
+using DG.Tweening;
 using TMPro;
 using UnityEngine;
 
 /// <summary>
-/// Component on each puzzle piece prefab.
-/// Displays color + remaining amount. Filled by baskets via AutoFill.
+/// Component on each puzzle piece (pre-setup in level prefab).
+/// Piece GO name = index in chain (1, 2, 3...).
+/// Visual: material color + SkinnedMeshRenderer BlendShape for fill progress.
+/// Amount text instantiated by script from AmountTextPrefab.
 /// </summary>
 public class PuzzlePiece : MonoBehaviour
 {
+    [Header("BlendShape")]
+    public float BlendShapeTransitionDuration = 0.3f;
+
     public GameColor Color { get; private set; }
     public int RemainingAmount { get; private set; }
+    public int OriginalAmount { get; private set; }
     public bool IsCleared { get; private set; }
 
-    SpriteRenderer spriteRenderer;
+    /// <summary>
+    /// Fill percentage: 0 = empty, 1 = fully filled (cleared).
+    /// </summary>
+    public float FillPercentage => OriginalAmount > 0
+        ? 1f - (float)RemainingAmount / OriginalAmount
+        : 0f;
+
+    Renderer meshRenderer;
+    SkinnedMeshRenderer skinnedMeshRenderer;
     TextMeshPro tmpText;
+    Transform tmpTextTransform; // For ignoring parent rotation
+    MaterialPropertyBlock propBlock;
 
     public void Initialize(GameColor color, int amount)
     {
         Color = color;
+        OriginalAmount = amount;
         RemainingAmount = amount;
         IsCleared = false;
 
-        spriteRenderer = GetComponentInChildren<SpriteRenderer>();
-        tmpText = GetComponentInChildren<TextMeshPro>();
+        // Material color (on same object as PuzzlePiece)
+        meshRenderer = GetComponent<Renderer>();
+        propBlock = new MaterialPropertyBlock();
+        UpdateMaterialColor(color);
 
-        if (spriteRenderer != null)
-            spriteRenderer.color = color.ToColor();
+        // SkinnedMeshRenderer for BlendShape (may be on this or child)
+        skinnedMeshRenderer = GetComponentInChildren<SkinnedMeshRenderer>();
+
+        // Instantiate amount text from Resources
+        var amountPrefab = Resources.Load<GameObject>("Prefabs/AmountText");
+        if (amountPrefab != null)
+        {
+            var textGo = Instantiate(amountPrefab, transform);
+
+            // Position at mesh center (not pivot)
+            if (meshRenderer != null)
+                textGo.transform.position = meshRenderer.bounds.center;
+            else
+                textGo.transform.localPosition = Vector3.zero;
+
+            tmpText = textGo.GetComponentInChildren<TextMeshPro>();
+
+            // Set the Text child's global z = -10 for always-on-top
+            if (tmpText != null)
+            {
+                tmpTextTransform = tmpText.transform;
+                var pos = tmpTextTransform.position;
+                tmpTextTransform.position = pos;
+            }
+        }
 
         UpdateDisplay();
+        UpdateBlendShape(0f, true); // Start at 0% fill
     }
 
     /// <summary>
     /// Fill this piece with the given amount.
-    /// Returns leftover amount (0 if basket fully consumed, >0 if piece cleared and basket has remainder).
+    /// Returns leftover (0 = basket fully consumed, >0 = piece cleared with basket remainder).
     /// </summary>
     public int Fill(int amount)
     {
@@ -41,13 +85,15 @@ public class PuzzlePiece : MonoBehaviour
         RemainingAmount -= used;
         int leftover = amount - used;
 
+        UpdateDisplay();
+        UpdateBlendShape(FillPercentage, false);
+
         if (RemainingAmount <= 0)
         {
             RemainingAmount = 0;
             SetCleared();
         }
 
-        UpdateDisplay();
         return leftover;
     }
 
@@ -56,15 +102,10 @@ public class PuzzlePiece : MonoBehaviour
         IsCleared = true;
         RemainingAmount = 0;
 
-        if (spriteRenderer != null)
-        {
-            var c = spriteRenderer.color;
-            c.a = 0.3f;
-            spriteRenderer.color = c;
-        }
+        UpdateBlendShape(1f, false);
 
-        transform.localScale = Vector3.one * 0.85f;
-        UpdateDisplay();
+        // Remove piece GO after a short delay for visual feedback
+        Destroy(gameObject, BlendShapeTransitionDuration + 0.1f);
     }
 
     /// <summary>
@@ -74,6 +115,39 @@ public class PuzzlePiece : MonoBehaviour
     {
         if (IsCleared) return;
         transform.localScale = active ? Vector3.one * 1.1f : Vector3.one;
+    }
+
+    void UpdateMaterialColor(GameColor color)
+    {
+        if (meshRenderer == null) return;
+        meshRenderer.material.color = color.ToColor();
+    }
+
+    void UpdateBlendShape(float fillPercent, bool instant)
+    {
+        if (skinnedMeshRenderer == null) return;
+        if (skinnedMeshRenderer.sharedMesh == null) return;
+        if (skinnedMeshRenderer.sharedMesh.blendShapeCount == 0) return;
+
+        float targetWeight = fillPercent * 100f; // BlendShape weight is 0-100
+
+        if (instant)
+        {
+            skinnedMeshRenderer.SetBlendShapeWeight(0, targetWeight);
+        }
+        else
+        {
+            float current = skinnedMeshRenderer.GetBlendShapeWeight(0);
+            DOTween.To(
+                () => current,
+                v => {
+                    current = v;
+                    skinnedMeshRenderer.SetBlendShapeWeight(0, v);
+                },
+                targetWeight,
+                BlendShapeTransitionDuration
+            ).SetEase(Ease.OutQuad);
+        }
     }
 
     void UpdateDisplay()
