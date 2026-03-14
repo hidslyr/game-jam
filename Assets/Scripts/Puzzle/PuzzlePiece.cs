@@ -30,6 +30,10 @@ public class PuzzlePiece : MonoBehaviour
     SkinnedMeshRenderer skinnedMeshRenderer;
     TextMeshPro tmpText;
     Transform tmpTextTransform; // For ignoring parent rotation
+    MaterialPropertyBlock propBlock;
+    static readonly int ColorId = Shader.PropertyToID("_BaseColor");
+    const float AlphaStart = 1f;        // 255/255
+    const float AlphaEnd   = 0.55f;     // ~140/255
 
     public void Initialize(GameColor color, int amount)
     {
@@ -41,6 +45,7 @@ public class PuzzlePiece : MonoBehaviour
         // Material swap (on same object as PuzzlePiece)
         meshRenderer = GetComponent<Renderer>();
         SwapMaterial(color);
+        propBlock = new MaterialPropertyBlock();
 
         // SkinnedMeshRenderer for BlendShape (may be on this or child)
         skinnedMeshRenderer = GetComponentInChildren<SkinnedMeshRenderer>();
@@ -114,8 +119,23 @@ public class PuzzlePiece : MonoBehaviour
     public void UpdateFillVisual()
     {
         float percent = FillPercentage + (float)VisualFilledBonus / Mathf.Max(1, OriginalAmount);
-        UpdateBlendShape(Mathf.Clamp01(percent), true); // instant = true for smooth per-frame
+        percent = Mathf.Clamp01(percent);
+        UpdateBlendShape(percent, true);
+        UpdateAlpha(percent);
         UpdateDisplay();
+    }
+
+    void UpdateAlpha(float fillPercent)
+    {
+        if (meshRenderer == null || propBlock == null) return;
+        meshRenderer.GetPropertyBlock(propBlock);
+        var baseColor = meshRenderer.sharedMaterial.color;
+        float alphaEnd = GameManager.Instance?.AnimConfig != null
+            ? GameManager.Instance.AnimConfig.PieceFillAlphaEnd / 255f
+            : AlphaEnd;
+        float alpha = Mathf.Lerp(AlphaStart, alphaEnd, fillPercent);
+        propBlock.SetColor(ColorId, new UnityEngine.Color(baseColor.r, baseColor.g, baseColor.b, alpha));
+        meshRenderer.SetPropertyBlock(propBlock);
     }
 
     /// <summary>

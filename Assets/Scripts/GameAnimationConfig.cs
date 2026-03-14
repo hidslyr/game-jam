@@ -20,4 +20,7 @@ public class GameAnimationConfig : ScriptableObject
 
     [Tooltip("Fill completes in PumpDuration / this value. Higher = faster fill, more gap between pumps")]
     public float FillSpeedMultiplier = 2f;
+
+    [Tooltip("Piece alpha (0-255) when fully filled. 255 = opaque, lower = more transparent")]
+    public float PieceFillAlphaEnd = 225f;
 }
