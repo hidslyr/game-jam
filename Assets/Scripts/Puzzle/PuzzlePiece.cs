@@ -120,12 +120,12 @@ public class PuzzlePiece : MonoBehaviour
 
     /// <summary>
     /// Finalize fill — check if cleared after all pumps done.
+    /// Blendshape is already at target from per-frame UpdateFillVisual().
     /// </summary>
     public void FinalizeFill()
     {
         VisualFilledBonus = 0;
         UpdateDisplay();
-        UpdateBlendShape(FillPercentage, false);
         if (RemainingAmount <= 0)
         {
             RemainingAmount = 0;
@@ -138,19 +138,11 @@ public class PuzzlePiece : MonoBehaviour
         IsCleared = true;
         RemainingAmount = 0;
 
-        UpdateBlendShape(1f, false);
+        // Blendshape already at 100% from per-frame updates — just ensure final value
+        UpdateBlendShape(1f, true);
 
-        // Play FX + destroy after blend shape transition completes
-        StartCoroutine(ClearAfterTransition());
-    }
-
-    System.Collections.IEnumerator ClearAfterTransition()
-    {
-        yield return new WaitForSeconds(BlendShapeTransitionDuration);
-
-        // VFX + SFX at the moment piece visually disappears
+        // VFX + SFX + destroy immediately (no delay needed)
         GameManager.Instance?.PlayPieceClearEffect(transform.position);
-
         Destroy(gameObject);
     }
 
