@@ -19,6 +19,9 @@ public class GameManager : MonoBehaviour
     SFXLibrary sfxLibrary;
     AudioSource audioSource;
     ScreenShakeConfig shakeConfig;
+    GameAnimationConfig animConfig;
+
+    public GameAnimationConfig AnimConfig => animConfig;
 
     void Awake()
     {
@@ -35,6 +38,7 @@ public class GameManager : MonoBehaviour
         vfxLibrary = Resources.Load<VFXLibrary>("VFXLibrary");
         sfxLibrary = Resources.Load<SFXLibrary>("SFXLibrary");
         shakeConfig = Resources.Load<ScreenShakeConfig>("ScreenShakeConfig");
+        animConfig = Resources.Load<GameAnimationConfig>("GameAnimationConfig");
 
         // Setup audio
         audioSource = GetComponent<AudioSource>();

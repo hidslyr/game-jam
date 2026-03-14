@@ -731,8 +731,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::StagingSlots
   SlotSpacingX: 1.19
   FlyInDuration: 0.5
-  FillingJumpDuration: 0.3
-  FillDelay: 0.2
   SlotPrefab: {fileID: 4966085820824304620, guid: b24a6ebf490cb4408af113fc5384db25, type: 3}
 --- !u!1 &205844139
 GameObject:

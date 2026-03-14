@@ -24,6 +24,7 @@ public class PuzzleBoard : MonoBehaviour
     List<PuzzlePiece> pieces = new List<PuzzlePiece>();
     int currentPieceIndex = 0;
     GameObject pieceChainInstance; // The instantiated level chain prefab
+    bool isAutoFilling = false;
 
     void Awake()
     {
@@ -135,12 +136,14 @@ public class PuzzleBoard : MonoBehaviour
         // Wait for fly-to-slot animation
         yield return new WaitForSeconds(stagingSlots.FlyInDuration);
 
-        // Run sequential auto-fill
-        yield return StartCoroutine(AutoFillSequential());
+        // Run auto-fill (skip if already running — it will pick up new baskets)
+        if (!isAutoFilling)
+            yield return StartCoroutine(AutoFillSequential());
     }
 
     IEnumerator AutoFillSequential()
     {
+        isAutoFilling = true;
         while (true)
         {
             if (currentPieceIndex >= pieces.Count) break;
@@ -194,29 +197,52 @@ public class PuzzleBoard : MonoBehaviour
 
         // Check win/lose after cascade finishes
         CheckWinLose();
+        isAutoFilling = false;
     }
 
     IEnumerator FillFromSlot(PuzzlePiece piece, int slotIdx, int amount, System.Action onDone)
     {
-        // Fire "pump" trigger on basket's child Animator
         var basketGo = stagingSlots.GetSlotVisual(slotIdx);
+        Animator basketAnimator = null;
         if (basketGo != null)
+            basketAnimator = basketGo.GetComponentInChildren<Animator>();
+
+        int pumpCount = GameManager.Instance?.AnimConfig != null
+            ? GameManager.Instance.AnimConfig.PumpCount : 1;
+        float pumpDelay = GameManager.Instance?.AnimConfig != null
+            ? GameManager.Instance.AnimConfig.PumpRepeatDelay : 0.1f;
+
+        for (int p = 0; p < pumpCount; p++)
         {
-            var animator = basketGo.GetComponentInChildren<Animator>();
-            if (animator != null)
-                animator.SetTrigger("pump");
+            // Fire "pump" trigger on basket animator
+            if (basketAnimator != null)
+                basketAnimator.SetTrigger("pump");
+
+            // Play pump animation through pipe
+            if (flexiblePipe != null)
+                yield return flexiblePipe.PlayPump();
+
+            // Wait for basket pump animation to finish
+            if (basketAnimator != null)
+            {
+                yield return null;
+                var stateInfo = basketAnimator.GetCurrentAnimatorStateInfo(0);
+                float remaining = stateInfo.length - stateInfo.normalizedTime * stateInfo.length;
+                if (remaining > 0f)
+                    yield return new WaitForSeconds(remaining);
+            }
+
+            // Delay between repeats
+            if (p < pumpCount - 1)
+                yield return new WaitForSeconds(pumpDelay);
         }
 
-        // Play pump animation through pipe
-        if (flexiblePipe != null)
-            yield return flexiblePipe.PlayPump();
+        // Destroy basket at end of pump animation
+        GameManager.Instance?.PlayBasketEmptySFX();
+        stagingSlots.ClearSlot(slotIdx);
 
         // Fill the piece
         int leftover = piece.Fill(amount);
-
-        // Destroy basket in staging slot
-        GameManager.Instance?.PlayBasketEmptySFX();
-        stagingSlots.ClearSlot(slotIdx);
 
         if (leftover > 0 && !piece.IsCleared)
         {
