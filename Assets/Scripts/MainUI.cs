@@ -31,6 +31,10 @@ public class MainUI : MonoBehaviour
         FindAndWireButtons();
     }
 
+    // Debug piece stack
+    GameObject debugPieceStack;
+    System.Collections.Generic.List<TextMeshProUGUI> debugLabels = new System.Collections.Generic.List<TextMeshProUGUI>();
+
     void Start()
     {
         // Display current level from Global on initialize
@@ -38,6 +42,93 @@ public class MainUI : MonoBehaviour
         selectedLevel = currentLevel;
         if (txtSelectedLevel != null)
             txtSelectedLevel.text = $"Level {currentLevel}";
+
+        // Generate debug piece stack
+        GenerateDebugPieceStack();
+    }
+
+    void GenerateDebugPieceStack()
+    {
+        var levelData = GameManager.Instance?.CurrentLevelData;
+        if (levelData == null || levelData.PuzzlePieces == null) return;
+
+        // Destroy previous stack if any
+        if (debugPieceStack != null) Destroy(debugPieceStack);
+        debugLabels.Clear();
+
+        // Create container with vertical layout, top-left
+        debugPieceStack = new GameObject("DebugPieceStack");
+        debugPieceStack.transform.SetParent(transform, false);
+
+        var rect = debugPieceStack.AddComponent<RectTransform>();
+        rect.anchorMin = new Vector2(0f, 1f);
+        rect.anchorMax = new Vector2(0f, 1f);
+        rect.pivot = new Vector2(0f, 1f);
+        rect.anchoredPosition = new Vector2(20f, -20f);
+        rect.sizeDelta = new Vector2(200f, 0f);
+
+        var layout = debugPieceStack.AddComponent<VerticalLayoutGroup>();
+        layout.childAlignment = TextAnchor.UpperLeft;
+        layout.spacing = 4f;
+        layout.childControlWidth = true;
+        layout.childControlHeight = true;
+        layout.childForceExpandWidth = false;
+        layout.childForceExpandHeight = false;
+
+        var fitter = debugPieceStack.AddComponent<ContentSizeFitter>();
+        fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+        // Header
+        CreateDebugLabel(debugPieceStack.transform, "── Pieces ──", Color.white, 36);
+
+        // Each piece
+        for (int i = 0; i < levelData.PuzzlePieces.Length; i++)
+        {
+            var entry = levelData.PuzzlePieces[i];
+            string colorLetter = entry.Color.ToString()[0].ToString();
+            string label = $"{i + 1}. {colorLetter}:{entry.Amount}";
+            var tmp = CreateDebugLabel(debugPieceStack.transform, label, entry.Color.ToColor(), 32);
+            debugLabels.Add(tmp);
+        }
+    }
+
+    /// <summary>
+    /// Called by PuzzleBoard when a piece is cleared or updated.
+    /// </summary>
+    public void UpdateDebugPiece(int pieceIndex, int remainingAmount, bool cleared)
+    {
+        if (pieceIndex < 0 || pieceIndex >= debugLabels.Count) return;
+        var tmp = debugLabels[pieceIndex];
+        if (tmp == null) return;
+
+        if (cleared)
+        {
+            tmp.fontStyle = FontStyles.Strikethrough;
+            var c = tmp.color;
+            c.a = 0.3f;
+            tmp.color = c;
+            tmp.text = tmp.text.Split(':')[0] + ":0 ✓";
+        }
+        else
+        {
+            // Update remaining amount
+            var parts = tmp.text.Split(':');
+            tmp.text = parts[0] + ":" + remainingAmount;
+        }
+    }
+
+    TextMeshProUGUI CreateDebugLabel(Transform parent, string text, Color color, int fontSize)
+    {
+        var go = new GameObject("DebugLabel");
+        go.transform.SetParent(parent, false);
+
+        var tmp = go.AddComponent<TextMeshProUGUI>();
+        tmp.text = text;
+        tmp.color = color;
+        tmp.fontSize = fontSize;
+        tmp.fontStyle = FontStyles.Bold;
+        tmp.enableAutoSizing = false;
+        return tmp;
     }
 
     void FindAndWireButtons()

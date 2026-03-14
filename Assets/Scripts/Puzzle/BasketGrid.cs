@@ -10,7 +10,7 @@ public class BasketGrid : MonoBehaviour
 {
     [Header("Grid Layout")]
     public float BasketSpacingX = 1.2f;
-    public float BasketSpacingY = 1.2f;
+    public float BasketSpacingZ = 1.2f;
     public float GravityAnimDuration = 0.3f;
 
     [Header("Prefab")]
@@ -118,9 +118,9 @@ public class BasketGrid : MonoBehaviour
 
     Vector3 GetWorldPosition(int col, int depth)
     {
-        // Column left-to-right, depth top-to-bottom (depth 0 = top)
+        // Column left-to-right on X, depth along Z (top-down camera)
         float x = col * BasketSpacingX;
-        float y = -depth * BasketSpacingY;
-        return new Vector3(x, y, 0f);
+        float z = -depth * BasketSpacingZ;
+        return new Vector3(x, 0f, z);
     }
 }

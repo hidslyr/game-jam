@@ -11,6 +11,8 @@ public class StagingSlots : MonoBehaviour
     [Header("Slot Layout")]
     public float SlotSpacingX = 1.2f;
     public float FlyInDuration = 0.5f;
+    public float FillingJumpDuration = 0.3f;
+    public float FillDelay = 0.2f;
 
     [Header("Prefab")]
     public GameObject SlotPrefab; // Visual slot outline
@@ -18,6 +20,8 @@ public class StagingSlots : MonoBehaviour
     int slotCount;
     SlotData[] slots;
     Transform[] slotTransforms;
+    Transform anchorPoint;
+    Transform fillingPoint;
 
     struct SlotData
     {
@@ -32,6 +36,14 @@ public class StagingSlots : MonoBehaviour
         slotCount = count;
         slots = new SlotData[slotCount];
         slotTransforms = new Transform[slotCount];
+
+        // Find AnchorPoint child as slot origin
+        var anchor = transform.Find("AnchorPoint");
+        anchorPoint = anchor != null ? anchor : transform;
+
+        // Find BasketFillingPoint
+        var fp = transform.Find("BasketFillingPoint");
+        fillingPoint = fp != null ? fp : transform;
 
         // Spawn slot outlines
         for (int i = 0; i < slotCount; i++)
@@ -63,7 +75,7 @@ public class StagingSlots : MonoBehaviour
         // Reparent and animate fly to slot position
         basketGo.transform.SetParent(transform);
         var targetPos = GetSlotPosition(idx);
-        targetPos.z = -1f; // Render basket in front of slot outline (ortho camera)
+        targetPos.y = 0.1f; // Slight Y offset so basket sits above slot (top-down camera)
         basketGo.transform.DOLocalMove(targetPos, FlyInDuration).SetEase(Ease.OutBack);
 
         return idx;
@@ -80,6 +92,29 @@ public class StagingSlots : MonoBehaviour
             Destroy(slots[idx].Visual);
 
         slots[idx] = default;
+    }
+
+    /// <summary>
+    /// Animate a basket from its slot to the BasketFillingPoint.
+    /// Returns the basket GO. Slot is cleared after move.
+    /// </summary>
+    public GameObject MoveBasketToFillingPoint(int idx)
+    {
+        if (idx < 0 || idx >= slotCount) return null;
+        if (!slots[idx].Filled) return null;
+
+        var basketGo = slots[idx].Visual;
+        if (basketGo == null) return null;
+
+        // Detach from slot data (slot becomes empty)
+        slots[idx].Visual = null;
+        slots[idx] = default;
+
+        // Animate to filling point
+        var targetPos = fillingPoint.position;
+        basketGo.transform.DOMove(targetPos, FillingJumpDuration).SetEase(Ease.OutBack);
+
+        return basketGo;
     }
 
     /// <summary>
@@ -131,7 +166,9 @@ public class StagingSlots : MonoBehaviour
 
     Vector3 GetSlotPosition(int idx)
     {
-        float x = idx * SlotSpacingX;
-        return new Vector3(x, 0f, 0f);
+        // Offset from AnchorPoint, not StagingSlots center
+        var origin = anchorPoint != null ? anchorPoint.localPosition : Vector3.zero;
+        float x = origin.x + idx * SlotSpacingX;
+        return new Vector3(x, origin.y, origin.z);
     }
 }

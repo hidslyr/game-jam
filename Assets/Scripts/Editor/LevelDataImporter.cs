@@ -20,7 +20,7 @@ public class LevelDataImporter : Editor
     {
         { 1, 0 },
         { 2, 129557841 },
-        { 3, 129557841 }
+        { 3, 449358609 }
     };
 
     [MenuItem("CONTEXT/LevelData/Import from Google Sheet")]
@@ -190,6 +190,8 @@ public class LevelDataImporter : Editor
             case "R": color = GameColor.Red; break;
             case "G": color = GameColor.Green; break;
             case "B": color = GameColor.Blue; break;
+            case "Y": color = GameColor.Yellow; break;
+            case "P": color = GameColor.Purple; break;
             default: return null;
         }
 

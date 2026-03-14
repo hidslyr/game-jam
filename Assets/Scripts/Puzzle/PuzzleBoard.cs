@@ -127,52 +127,60 @@ public class PuzzleBoard : MonoBehaviour
             yield break;
         }
 
-        // Wait for fly animation to finish before auto-fill
+        // Wait for fly-to-slot animation
         yield return new WaitForSeconds(stagingSlots.FlyInDuration);
 
-        // Run auto-fill cascade
-        AutoFill();
-
-        // Check win/lose
-        CheckWinLose();
+        // Run sequential auto-fill
+        yield return StartCoroutine(AutoFillSequential());
     }
 
-    void AutoFill()
+    IEnumerator AutoFillSequential()
     {
-        bool changed = true;
-        while (changed)
+        while (true)
         {
-            changed = false;
             if (currentPieceIndex >= pieces.Count) break;
 
             var piece = pieces[currentPieceIndex];
-            if (piece.IsCleared)
+
+            // Skip cleared pieces
+            if (piece == null || piece.IsCleared)
             {
                 currentPieceIndex++;
                 UpdateActivePiece();
-                changed = true;
                 continue;
             }
 
-            // Find a staging slot matching current piece color
+            // Find matching basket in staging slots
             int matchIdx = stagingSlots.FindMatchingSlot(piece.Color);
-            if (matchIdx == -1) break;
+            if (matchIdx == -1) break; // No match — done for now
 
             int slotAmount = stagingSlots.GetSlotAmount(matchIdx);
+
+            // Move basket from slot to BasketFillingPoint
+            var basketGo = stagingSlots.MoveBasketToFillingPoint(matchIdx);
+            if (basketGo == null) break;
+
+            // Wait for jump animation
+            yield return new WaitForSeconds(stagingSlots.FillingJumpDuration);
+
+            // Short delay before filling
+            yield return new WaitForSeconds(stagingSlots.FillDelay);
+
+            // Fill the piece
             int leftover = piece.Fill(slotAmount);
 
-            // Always re-check after any fill operation
-            changed = true;
+            // Update debug UI
+            MainUI.Instance?.UpdateDebugPiece(currentPieceIndex, piece.RemainingAmount, piece.IsCleared);
 
-            if (leftover <= 0)
+            // Basket always destroyed after filling (fully consumed or leftover)
+            Destroy(basketGo);
+
+            if (leftover > 0 && !piece.IsCleared)
             {
-                // Basket fully consumed
-                stagingSlots.ClearSlot(matchIdx);
-            }
-            else
-            {
-                // Basket has leftover — stays in slot with updated amount
-                stagingSlots.UpdateSlotAmount(matchIdx, leftover);
+                // Leftover but piece not cleared — LOSE
+                Debug.Log("[PuzzleBoard] LOSE — basket has leftover but can't fill piece!");
+                GameManager.Instance?.TriggerLose();
+                yield break;
             }
 
             if (piece.IsCleared)
@@ -182,6 +190,9 @@ public class PuzzleBoard : MonoBehaviour
                 // Continue loop — cascade to next piece
             }
         }
+
+        // Check win/lose after cascade finishes
+        CheckWinLose();
     }
 
     void CheckWinLose()
