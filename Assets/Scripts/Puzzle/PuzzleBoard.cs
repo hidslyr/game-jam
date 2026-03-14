@@ -195,6 +195,10 @@ public class PuzzleBoard : MonoBehaviour
 
             if (piece.IsCleared)
             {
+                // Extend active pipe through cleared piece
+                if (flexiblePipe != null)
+                    flexiblePipe.OnPieceCleared();
+
                 currentPieceIndex++;
                 UpdateActivePiece();
                 // Continue loop — cascade to next piece
@@ -251,6 +255,11 @@ public class PuzzleBoard : MonoBehaviour
         if (currentPieceIndex >= 0 && currentPieceIndex < pieces.Count)
             return pieces[currentPieceIndex];
         return null;
+    }
+
+    public List<PuzzlePiece> GetAllPieces()
+    {
+        return pieces;
     }
 
     void UpdateActivePiece()
