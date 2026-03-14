@@ -17,11 +17,11 @@ MonoBehaviour:
   PuzzlePieces:
   - Color: 0
     Amount: 30
-  - Color: 3
-    Amount: 30
   - Color: 2
     Amount: 30
   - Color: 1
+    Amount: 30
+  - Color: 3
     Amount: 30
   - Color: 4
     Amount: 30
@@ -29,53 +29,22 @@ MonoBehaviour:
     Amount: 30
   - Color: 2
     Amount: 30
-  - Color: 3
-    Amount: 40
   - Color: 1
-    Amount: 40
+    Amount: 30
   - Color: 4
+    Amount: 30
+  - Color: 3
     Amount: 30
   GridRows:
   - Baskets:
     - IsEmpty: 0
-      Color: 2
-      Amount: 10
-    - IsEmpty: 0
-      Color: 0
+      Color: 4
       Amount: 10
     - IsEmpty: 0
       Color: 3
       Amount: 10
     - IsEmpty: 0
-      Color: 1
-      Amount: 10
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-  - Baskets:
-    - IsEmpty: 0
       Color: 4
-      Amount: 10
-    - IsEmpty: 0
-      Color: 2
-      Amount: 10
-    - IsEmpty: 0
-      Color: 0
       Amount: 10
     - IsEmpty: 0
       Color: 3
@@ -100,16 +69,140 @@ MonoBehaviour:
       Amount: 0
   - Baskets:
     - IsEmpty: 0
-      Color: 1
-      Amount: 10
-    - IsEmpty: 0
-      Color: 4
+      Color: 0
       Amount: 10
     - IsEmpty: 0
       Color: 2
       Amount: 10
     - IsEmpty: 0
+      Color: 1
+      Amount: 10
+    - IsEmpty: 0
       Color: 0
+      Amount: 10
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+  - Baskets:
+    - IsEmpty: 0
+      Color: 2
+      Amount: 10
+    - IsEmpty: 0
+      Color: 1
+      Amount: 10
+    - IsEmpty: 0
+      Color: 0
+      Amount: 10
+    - IsEmpty: 0
+      Color: 2
+      Amount: 10
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+  - Baskets:
+    - IsEmpty: 0
+      Color: 1
+      Amount: 10
+    - IsEmpty: 0
+      Color: 0
+      Amount: 10
+    - IsEmpty: 0
+      Color: 0
+      Amount: 10
+    - IsEmpty: 0
+      Color: 0
+      Amount: 10
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+  - Baskets:
+    - IsEmpty: 0
+      Color: 2
+      Amount: 10
+    - IsEmpty: 0
+      Color: 4
+      Amount: 10
+    - IsEmpty: 0
+      Color: 1
+      Amount: 10
+    - IsEmpty: 0
+      Color: 1
+      Amount: 10
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+  - Baskets:
+    - IsEmpty: 0
+      Color: 1
+      Amount: 10
+    - IsEmpty: 0
+      Color: 3
+      Amount: 10
+    - IsEmpty: 0
+      Color: 3
+      Amount: 10
+    - IsEmpty: 0
+      Color: 4
       Amount: 10
     - IsEmpty: 1
       Color: 0
@@ -134,103 +227,10 @@ MonoBehaviour:
       Color: 3
       Amount: 10
     - IsEmpty: 0
-      Color: 1
-      Amount: 10
-    - IsEmpty: 0
-      Color: 4
-      Amount: 10
-    - IsEmpty: 0
-      Color: 2
-      Amount: 10
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-  - Baskets:
-    - IsEmpty: 0
-      Color: 0
-      Amount: 10
-    - IsEmpty: 0
-      Color: 3
-      Amount: 10
-    - IsEmpty: 0
-      Color: 1
-      Amount: 10
-    - IsEmpty: 0
-      Color: 4
-      Amount: 10
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-  - Baskets:
-    - IsEmpty: 0
       Color: 2
       Amount: 10
     - IsEmpty: 0
-      Color: 0
-      Amount: 10
-    - IsEmpty: 0
-      Color: 3
-      Amount: 10
-    - IsEmpty: 0
-      Color: 1
-      Amount: 10
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-  - Baskets:
-    - IsEmpty: 0
-      Color: 4
-      Amount: 10
-    - IsEmpty: 0
       Color: 2
-      Amount: 10
-    - IsEmpty: 0
-      Color: 0
       Amount: 10
     - IsEmpty: 0
       Color: 3
@@ -255,17 +255,17 @@ MonoBehaviour:
       Amount: 0
   - Baskets:
     - IsEmpty: 0
-      Color: 1
+      Color: 4
       Amount: 10
     - IsEmpty: 0
       Color: 4
       Amount: 10
-    - IsEmpty: 0
-      Color: 2
-      Amount: 10
-    - IsEmpty: 0
+    - IsEmpty: 1
       Color: 0
-      Amount: 10
+      Amount: 0
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
     - IsEmpty: 1
       Color: 0
       Amount: 0

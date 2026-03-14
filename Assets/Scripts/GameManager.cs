@@ -74,6 +74,18 @@ public class GameManager : MonoBehaviour
             audioSource.PlayOneShot(sfxLibrary.PieceFill);
     }
 
+    public void PlayBasketPickSFX()
+    {
+        if (sfxLibrary != null && sfxLibrary.BasketPick != null && audioSource != null)
+            audioSource.PlayOneShot(sfxLibrary.BasketPick);
+    }
+
+    public void PlayBasketEmptySFX()
+    {
+        if (sfxLibrary != null && sfxLibrary.BasketEmpty != null && audioSource != null)
+            audioSource.PlayOneShot(sfxLibrary.BasketEmpty);
+    }
+
     void InitLevel()
     {
         int targetLevel = Global.Instance != null ? Global.Instance.CurrentLevel : 1;

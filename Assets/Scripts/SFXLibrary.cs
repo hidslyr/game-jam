@@ -13,7 +13,7 @@ public class SFXLibrary : ScriptableObject
 
     [Header("Basket SFX")]
     public AudioClip BasketPick;
-    public AudioClip BasketFill;
+    public AudioClip BasketEmpty;
 
     [Header("Game State SFX")]
     public AudioClip Win;
