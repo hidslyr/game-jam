@@ -12,4 +12,5 @@ public class VFXLibrary : ScriptableObject
 
     [Header("Basket Effects")]
     public ParticleSystem BasketPickFX;
+    public ParticleSystem BasketDisappearFX;
 }

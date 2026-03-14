@@ -14,3 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::VFXLibrary
   PieceClearFX: {fileID: 3384896629318458279, guid: 46fe83aefdf79214698f566766bbdd1a, type: 3}
   BasketPickFX: {fileID: 0}
+  BasketDisappearFX: {fileID: 7658002353762823173, guid: a9417075323c92e4c80099ae3841b963, type: 3}

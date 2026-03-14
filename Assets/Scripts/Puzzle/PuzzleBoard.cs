@@ -271,7 +271,9 @@ public class PuzzleBoard : MonoBehaviour
         while (!fillDone)
             yield return null;
 
-        // Destroy basket
+        // Basket disappear VFX + SFX
+        var disappearPos = stagingSlots.GetSlotVisual(slotIdx)?.transform.position ?? Vector3.zero;
+        GameManager.Instance?.PlayBasketDisappearEffect(disappearPos);
         GameManager.Instance?.PlayBasketEmptySFX();
         stagingSlots.ClearSlot(slotIdx);
 

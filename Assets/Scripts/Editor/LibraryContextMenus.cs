@@ -38,11 +38,24 @@ public static class LibraryContextMenus
         Debug.Log($"[VFXLibrary] BasketPickFX → {ps.name}");
     }
 
+    [MenuItem("Assets/Assign to VFX Library/Basket Disappear FX")]
+    static void AssignBasketDisappearFX()
+    {
+        var lib = LoadOrCreateVFXLibrary();
+        var ps = GetParticleSystemFromSelection();
+        if (ps == null || lib == null) return;
+        lib.BasketDisappearFX = ps;
+        EditorUtility.SetDirty(lib);
+        AssetDatabase.SaveAssets();
+        Debug.Log($"[VFXLibrary] BasketDisappearFX → {ps.name}");
+    }
+
 
 
     // Validation — only show when a prefab with ParticleSystem is selected
     [MenuItem("Assets/Assign to VFX Library/Piece Clear FX", true)]
     [MenuItem("Assets/Assign to VFX Library/Basket Pick FX", true)]
+    [MenuItem("Assets/Assign to VFX Library/Basket Disappear FX", true)]
     static bool ValidateParticleSystemSelection()
     {
         return GetParticleSystemFromSelection() != null;

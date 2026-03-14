@@ -99,6 +99,18 @@ public class GameManager : MonoBehaviour
             audioSource.PlayOneShot(sfxLibrary.BasketEmpty);
     }
 
+    public void PlayBasketDisappearEffect(Vector3 position)
+    {
+        if (vfxLibrary != null && vfxLibrary.BasketDisappearFX != null)
+        {
+            Vector3 offset = vfxLibrary.BasketDisappearFX.transform.position;
+            Quaternion rotation = vfxLibrary.BasketDisappearFX.transform.rotation;
+            var fx = Instantiate(vfxLibrary.BasketDisappearFX, position + offset, rotation);
+            fx.Play();
+            Destroy(fx.gameObject, fx.main.duration + fx.main.startLifetime.constantMax);
+        }
+    }
+
     void InitLevel()
     {
         int targetLevel = Global.Instance != null ? Global.Instance.CurrentLevel : 1;
