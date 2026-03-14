@@ -102,8 +102,18 @@ public class PuzzlePiece : MonoBehaviour
 
         UpdateBlendShape(1f, false);
 
-        // Remove piece GO after a short delay for visual feedback
-        Destroy(gameObject, BlendShapeTransitionDuration + 0.1f);
+        // Play FX + destroy after blend shape transition completes
+        StartCoroutine(ClearAfterTransition());
+    }
+
+    System.Collections.IEnumerator ClearAfterTransition()
+    {
+        yield return new WaitForSeconds(BlendShapeTransitionDuration);
+
+        // VFX + SFX at the moment piece visually disappears
+        GameManager.Instance?.PlayPieceClearEffect(transform.position);
+
+        Destroy(gameObject, 0.1f);
     }
 
     /// <summary>

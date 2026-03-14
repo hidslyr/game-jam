@@ -14,6 +14,10 @@ public class GameManager : MonoBehaviour
 
     public LevelData CurrentLevelData { get; private set; }
 
+    VFXLibrary vfxLibrary;
+    SFXLibrary sfxLibrary;
+    AudioSource audioSource;
+
     void Awake()
     {
         if (Instance != null && Instance != this)
@@ -24,6 +28,16 @@ public class GameManager : MonoBehaviour
         Instance = this;
 
         AllLevels = Resources.LoadAll<LevelData>("LevelData");
+
+        // Load libraries from Resources
+        vfxLibrary = Resources.Load<VFXLibrary>("VFXLibrary");
+        sfxLibrary = Resources.Load<SFXLibrary>("SFXLibrary");
+
+        // Setup audio
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+            audioSource = gameObject.AddComponent<AudioSource>();
+        audioSource.playOnAwake = false;
     }
 
     void Start()
@@ -32,8 +46,25 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Load level data based on Global's current level. Does NOT start gameplay yet.
+    /// Play particle FX and SFX at the given position when a piece is cleared.
     /// </summary>
+    public void PlayPieceClearEffect(Vector3 position)
+    {
+        // Particle FX from VFXLibrary (prefab position used as offset)
+        if (vfxLibrary != null && vfxLibrary.PieceClearFX != null)
+        {
+            Vector3 offset = vfxLibrary.PieceClearFX.transform.position;
+            Quaternion rotation = vfxLibrary.PieceClearFX.transform.rotation;
+            var fx = Instantiate(vfxLibrary.PieceClearFX, position + offset, rotation);
+            fx.Play();
+            Destroy(fx.gameObject, fx.main.duration + fx.main.startLifetime.constantMax);
+        }
+
+        // SFX from SFXLibrary
+        if (sfxLibrary != null && sfxLibrary.PieceClear != null && audioSource != null)
+            audioSource.PlayOneShot(sfxLibrary.PieceClear);
+    }
+
     void InitLevel()
     {
         int targetLevel = Global.Instance != null ? Global.Instance.CurrentLevel : 1;
@@ -54,22 +85,14 @@ public class GameManager : MonoBehaviour
         Debug.Log($"[GameManager] Level {targetLevel} initialized. LevelData found: {CurrentLevelData != null}");
     }
 
-    /// <summary>
-    /// Start gameplay — sets state to Playing.
-    /// Block interaction logic can be added here later.
-    /// </summary>
     public void StartLevel()
     {
         if (Global.Instance != null)
             Global.Instance.CurrentState = Global.GameState.Playing;
 
         Debug.Log("[GameManager] Level started — state → Playing");
-        // TODO: unblock player interaction here when implemented
     }
 
-    /// <summary>
-    /// Trigger win condition → show EndScreen.
-    /// </summary>
     public void TriggerWin()
     {
         if (Global.Instance != null)
@@ -79,9 +102,6 @@ public class GameManager : MonoBehaviour
         EndScreenUI.Instance?.Show(true);
     }
 
-    /// <summary>
-    /// Trigger lose condition → show EndScreen.
-    /// </summary>
     public void TriggerLose()
     {
         if (Global.Instance != null)
@@ -91,9 +111,6 @@ public class GameManager : MonoBehaviour
         EndScreenUI.Instance?.Show(false);
     }
 
-    /// <summary>
-    /// Reload Main scene with next level.
-    /// </summary>
     public void LoadNextLevel()
     {
         if (Global.Instance != null)
@@ -105,11 +122,9 @@ public class GameManager : MonoBehaviour
         SceneManager.LoadScene("Main");
     }
 
-    /// <summary>
-    /// Reload Main scene with current level.
-    /// </summary>
     public void ReloadCurrentLevel()
     {
         SceneManager.LoadScene("Main");
     }
 }
+
