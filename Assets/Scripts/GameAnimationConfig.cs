@@ -13,4 +13,8 @@ public class GameAnimationConfig : ScriptableObject
 
     [Tooltip("Delay between pump repeats")]
     public float PumpRepeatDelay = 0.1f;
+
+    [Header("Fill Animation")]
+    [Tooltip("Duration of gradual basket→piece amount transfer")]
+    public float FillDuration = 0.5f;
 }

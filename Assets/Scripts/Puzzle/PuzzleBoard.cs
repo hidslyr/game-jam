@@ -205,31 +205,55 @@ public class PuzzleBoard : MonoBehaviour
         // Check win/lose after cascade finishes
         CheckWinLose();
         isAutoFilling = false;
+
+        // Re-check: new baskets may have arrived while filling
+        if (currentPieceIndex < pieces.Count)
+        {
+            var piece = pieces[currentPieceIndex];
+            if (piece != null && !piece.IsCleared)
+            {
+                var newMatches = stagingSlots.FindAllMatchingSlots(piece.Color);
+                if (newMatches.Count > 0)
+                    StartCoroutine(AutoFillSequential());
+            }
+        }
     }
 
     IEnumerator FillFromSlot(PuzzlePiece piece, int slotIdx, int amount, System.Action onDone)
     {
         var basketGo = stagingSlots.GetSlotVisual(slotIdx);
         Animator basketAnimator = null;
+        Basket basketComp = null;
         if (basketGo != null)
+        {
             basketAnimator = basketGo.GetComponentInChildren<Animator>();
+            basketComp = basketGo.GetComponent<Basket>();
+        }
 
-        int pumpCount = GameManager.Instance?.AnimConfig != null
-            ? GameManager.Instance.AnimConfig.PumpCount : 1;
-        float pumpDelay = GameManager.Instance?.AnimConfig != null
-            ? GameManager.Instance.AnimConfig.PumpRepeatDelay : 0.1f;
+        var animCfg = GameManager.Instance?.AnimConfig;
+        int pumpCount = animCfg != null ? animCfg.PumpCount : 1;
+        float pumpDelay = animCfg != null ? animCfg.PumpRepeatDelay : 0.1f;
+        float fillDuration = animCfg != null ? animCfg.FillDuration : 0.5f;
 
+        // Start gradual fill immediately (runs alongside pumps)
+        int used = Mathf.Min(amount, piece.RemainingAmount);
+        int startBasketAmt = amount;
+        bool fillDone = false;
+        StartCoroutine(GradualFillAnimation(piece, basketComp, used, startBasketAmt, fillDuration, () => fillDone = true));
+
+        // Pump loop
         for (int p = 0; p < pumpCount; p++)
         {
-            // Fire "pump" trigger on basket animator
             if (basketAnimator != null)
                 basketAnimator.SetTrigger("pump");
 
-            // Play pump animation through pipe
+            Coroutine pumpCo = null;
             if (flexiblePipe != null)
-                yield return flexiblePipe.PlayPump();
+                pumpCo = flexiblePipe.PlayPump();
 
-            // Wait for basket pump animation to finish
+            if (pumpCo != null)
+                yield return pumpCo;
+
             if (basketAnimator != null)
             {
                 yield return null;
@@ -239,16 +263,19 @@ public class PuzzleBoard : MonoBehaviour
                     yield return new WaitForSeconds(remaining);
             }
 
-            // Delay between repeats
             if (p < pumpCount - 1)
                 yield return new WaitForSeconds(pumpDelay);
         }
 
-        // Destroy basket at end of pump animation
+        // Wait for gradual fill to finish if pumps ended first
+        while (!fillDone)
+            yield return null;
+
+        // Destroy basket
         GameManager.Instance?.PlayBasketEmptySFX();
         stagingSlots.ClearSlot(slotIdx);
 
-        // Fill the piece
+        // Apply actual fill
         int leftover = piece.Fill(amount);
 
         if (leftover > 0 && !piece.IsCleared)
@@ -257,6 +284,37 @@ public class PuzzleBoard : MonoBehaviour
             GameManager.Instance?.TriggerLose();
         }
 
+        onDone?.Invoke();
+    }
+
+    IEnumerator GradualFillAnimation(PuzzlePiece piece, Basket basketComp, int used, int startBasketAmt, float duration, System.Action onDone)
+    {
+        int lastTransferred = 0;
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / duration);
+            int transferred = Mathf.RoundToInt(used * t);
+            int delta = transferred - lastTransferred;
+
+            if (delta > 0)
+            {
+                piece.VisualFilledBonus += delta;
+                lastTransferred = transferred;
+
+                if (basketComp != null)
+                    basketComp.SetAmount(startBasketAmt - transferred);
+
+                piece.SetDisplayText($"{piece.OriginalAmount - piece.RemainingAmount + piece.VisualFilledBonus}/{piece.OriginalAmount}");
+            }
+
+            yield return null;
+        }
+
+        // Reset visual bonus (actual Fill will update real amount)
+        piece.VisualFilledBonus -= used;
         onDone?.Invoke();
     }
 

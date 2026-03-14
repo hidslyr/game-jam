@@ -17,6 +17,7 @@ public class PuzzlePiece : MonoBehaviour
     public int RemainingAmount { get; private set; }
     public int OriginalAmount { get; private set; }
     public bool IsCleared { get; private set; }
+    public int VisualFilledBonus { get; set; } // Shared by parallel fill coroutines
 
     /// <summary>
     /// Fill percentage: 0 = empty, 1 = fully filled (cleared).
@@ -179,6 +180,23 @@ public class PuzzlePiece : MonoBehaviour
     void UpdateDisplay()
     {
         if (tmpText != null)
-            tmpText.text = IsCleared ? "✓" : RemainingAmount.ToString();
+        {
+            if (IsCleared)
+                tmpText.text = "✓";
+            else
+            {
+                int filled = OriginalAmount - RemainingAmount + VisualFilledBonus;
+                tmpText.text = $"{filled}/{OriginalAmount}";
+            }
+        }
+    }
+
+    /// <summary>
+    /// Set display text directly (used for gradual fill animation).
+    /// </summary>
+    public void SetDisplayText(string text)
+    {
+        if (tmpText != null)
+            tmpText.text = text;
     }
 }

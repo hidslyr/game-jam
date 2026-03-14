@@ -1,0 +1,3 @@
+1. Bugfix - If one basket is filling, pick another basket with the same color, second basket won't fill immediately but wait for first one finish. I want it to fill immediately. We're doing parallel filling.
+
+2. While filling, the amount in basket should decrease gradually from start to end of filling, get the duration from GameAnimationConfig. The piece amount will change to {0}/max amount. and first number should increase gradually corresponding to the decrease of amount in basket.
