@@ -11,6 +11,8 @@ public class StagingSlots : MonoBehaviour
     [Header("Slot Layout")]
     public float SlotSpacingX = 1.2f;
     public float FlyInDuration = 0.5f;
+    public float FillingJumpDuration = 0.3f;
+    public float FillDelay = 0.2f;
 
     [Header("Prefab")]
     public GameObject SlotPrefab; // Visual slot outline
@@ -19,6 +21,7 @@ public class StagingSlots : MonoBehaviour
     SlotData[] slots;
     Transform[] slotTransforms;
     Transform anchorPoint;
+    Transform fillingPoint;
 
     struct SlotData
     {
@@ -37,6 +40,10 @@ public class StagingSlots : MonoBehaviour
         // Find AnchorPoint child as slot origin
         var anchor = transform.Find("AnchorPoint");
         anchorPoint = anchor != null ? anchor : transform;
+
+        // Find BasketFillingPoint
+        var fp = transform.Find("BasketFillingPoint");
+        fillingPoint = fp != null ? fp : transform;
 
         // Spawn slot outlines
         for (int i = 0; i < slotCount; i++)
@@ -85,6 +92,29 @@ public class StagingSlots : MonoBehaviour
             Destroy(slots[idx].Visual);
 
         slots[idx] = default;
+    }
+
+    /// <summary>
+    /// Animate a basket from its slot to the BasketFillingPoint.
+    /// Returns the basket GO. Slot is cleared after move.
+    /// </summary>
+    public GameObject MoveBasketToFillingPoint(int idx)
+    {
+        if (idx < 0 || idx >= slotCount) return null;
+        if (!slots[idx].Filled) return null;
+
+        var basketGo = slots[idx].Visual;
+        if (basketGo == null) return null;
+
+        // Detach from slot data (slot becomes empty)
+        slots[idx].Visual = null;
+        slots[idx] = default;
+
+        // Animate to filling point
+        var targetPos = fillingPoint.position;
+        basketGo.transform.DOMove(targetPos, FillingJumpDuration).SetEase(Ease.OutBack);
+
+        return basketGo;
     }
 
     /// <summary>
