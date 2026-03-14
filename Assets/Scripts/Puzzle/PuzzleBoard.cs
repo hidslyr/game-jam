@@ -240,7 +240,7 @@ public class PuzzleBoard : MonoBehaviour
 
     IEnumerator DelayedEndScreen(bool isWin)
     {
-        yield return new WaitForSeconds(5f);
+        yield return new WaitForSeconds(3f);
 
         if (isWin)
             GameManager.Instance?.TriggerWin();

@@ -1,0 +1,2 @@
+1. Current basket spawn from left to right, I want it update to be from the center. Like first basket will have negative X.
+2. Update the moving upward position when basket is removed as well, to make sure it is not conflict with the old calculation.

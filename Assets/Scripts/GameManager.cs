@@ -1,3 +1,4 @@
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -17,6 +18,7 @@ public class GameManager : MonoBehaviour
     VFXLibrary vfxLibrary;
     SFXLibrary sfxLibrary;
     AudioSource audioSource;
+    ScreenShakeConfig shakeConfig;
 
     void Awake()
     {
@@ -32,6 +34,7 @@ public class GameManager : MonoBehaviour
         // Load libraries from Resources
         vfxLibrary = Resources.Load<VFXLibrary>("VFXLibrary");
         sfxLibrary = Resources.Load<SFXLibrary>("SFXLibrary");
+        shakeConfig = Resources.Load<ScreenShakeConfig>("ScreenShakeConfig");
 
         // Setup audio
         audioSource = GetComponent<AudioSource>();
@@ -63,6 +66,12 @@ public class GameManager : MonoBehaviour
         // SFX from SFXLibrary
         if (sfxLibrary != null && sfxLibrary.PieceClear != null && audioSource != null)
             audioSource.PlayOneShot(sfxLibrary.PieceClear);
+
+        // Screen shake
+        if (Camera.main != null && shakeConfig != null)
+            Camera.main.transform.DOShakePosition(shakeConfig.Duration, shakeConfig.Intensity,
+                shakeConfig.Vibrato, shakeConfig.Randomness, false, shakeConfig.FadeOut)
+                .SetUpdate(true);
     }
 
     /// <summary>
