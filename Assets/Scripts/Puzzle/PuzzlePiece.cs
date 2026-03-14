@@ -142,7 +142,9 @@ public class PuzzlePiece : MonoBehaviour
         UpdateBlendShape(1f, true);
 
         // VFX + SFX + destroy immediately (no delay needed)
-        GameManager.Instance?.PlayPieceClearEffect(transform.position);
+        var matColor = meshRenderer != null ? meshRenderer.material.color : UnityEngine.Color.white;
+        var vfxPos = meshRenderer != null ? meshRenderer.bounds.center : transform.position;
+        GameManager.Instance?.PlayPieceClearEffect(vfxPos, matColor);
         Destroy(gameObject);
     }
 

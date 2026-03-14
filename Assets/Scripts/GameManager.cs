@@ -55,7 +55,7 @@ public class GameManager : MonoBehaviour
     /// <summary>
     /// Play particle FX and SFX at the given position when a piece is cleared.
     /// </summary>
-    public void PlayPieceClearEffect(Vector3 position)
+    public void PlayPieceClearEffect(Vector3 position, UnityEngine.Color pieceColor)
     {
         // Particle FX from VFXLibrary (prefab position used as offset)
         if (vfxLibrary != null && vfxLibrary.PieceClearFX != null)
@@ -63,6 +63,17 @@ public class GameManager : MonoBehaviour
             Vector3 offset = vfxLibrary.PieceClearFX.transform.position;
             Quaternion rotation = vfxLibrary.PieceClearFX.transform.rotation;
             var fx = Instantiate(vfxLibrary.PieceClearFX, position + offset, rotation);
+
+            // Tint all child particles named "confetti_small" to match piece color
+            foreach (var ps in fx.GetComponentsInChildren<ParticleSystem>())
+            {
+                if (ps.gameObject.name == "confetti_small")
+                {
+                    var main = ps.main;
+                    main.startColor = pieceColor;
+                }
+            }
+
             fx.Play();
             Destroy(fx.gameObject, fx.main.duration + fx.main.startLifetime.constantMax);
         }
