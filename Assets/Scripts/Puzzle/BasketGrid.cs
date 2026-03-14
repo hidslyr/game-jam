@@ -18,6 +18,7 @@ public class BasketGrid : MonoBehaviour
 
     // columns[colIdx][depth] — depth 0 = top
     List<List<Basket>> columns = new List<List<Basket>>();
+    int columnCount; // Cached for centering
 
     /// <summary>
     /// Spawn baskets from LevelData grid rows, converting to columns.
@@ -39,6 +40,7 @@ public class BasketGrid : MonoBehaviour
                 maxCols = row.Baskets.Length;
 
         // Build columns from rows (row 0 = top)
+        columnCount = maxCols;
         for (int c = 0; c < maxCols; c++)
         {
             var col = new List<Basket>();
@@ -118,8 +120,9 @@ public class BasketGrid : MonoBehaviour
 
     Vector3 GetWorldPosition(int col, int depth)
     {
-        // Column left-to-right on X, depth along Z (top-down camera)
-        float x = col * BasketSpacingX;
+        // Center columns around origin on X axis
+        float offsetX = -(columnCount - 1) * BasketSpacingX * 0.5f;
+        float x = offsetX + col * BasketSpacingX;
         float z = -depth * BasketSpacingZ;
         return new Vector3(x, 0f, z);
     }
