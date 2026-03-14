@@ -17,4 +17,7 @@ public class GameAnimationConfig : ScriptableObject
     [Header("Fill Animation")]
     [Tooltip("Duration of gradual basket→piece amount transfer")]
     public float FillDuration = 0.5f;
+
+    [Tooltip("Fill completes in PumpDuration / this value. Higher = faster fill, more gap between pumps")]
+    public float FillSpeedMultiplier = 2f;
 }

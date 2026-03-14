@@ -97,6 +97,42 @@ public class PuzzlePiece : MonoBehaviour
         return leftover;
     }
 
+    /// <summary>
+    /// Apply a partial fill without triggering clear check.
+    /// Used during gradual pump animation.
+    /// </summary>
+    public void IncrementalFill(int delta)
+    {
+        if (IsCleared || delta <= 0) return;
+        RemainingAmount = Mathf.Max(0, RemainingAmount - delta);
+    }
+
+    /// <summary>
+    /// Update blendshape and display for current fill state.
+    /// Call each frame during pump animation.
+    /// </summary>
+    public void UpdateFillVisual()
+    {
+        float percent = FillPercentage + (float)VisualFilledBonus / Mathf.Max(1, OriginalAmount);
+        UpdateBlendShape(Mathf.Clamp01(percent), true); // instant = true for smooth per-frame
+        UpdateDisplay();
+    }
+
+    /// <summary>
+    /// Finalize fill — check if cleared after all pumps done.
+    /// </summary>
+    public void FinalizeFill()
+    {
+        VisualFilledBonus = 0;
+        UpdateDisplay();
+        UpdateBlendShape(FillPercentage, false);
+        if (RemainingAmount <= 0)
+        {
+            RemainingAmount = 0;
+            SetCleared();
+        }
+    }
+
     public void SetCleared()
     {
         IsCleared = true;
@@ -115,7 +151,7 @@ public class PuzzlePiece : MonoBehaviour
         // VFX + SFX at the moment piece visually disappears
         GameManager.Instance?.PlayPieceClearEffect(transform.position);
 
-        Destroy(gameObject, 0.1f);
+        Destroy(gameObject);
     }
 
     /// <summary>
@@ -186,9 +222,18 @@ public class PuzzlePiece : MonoBehaviour
             else
             {
                 int filled = OriginalAmount - RemainingAmount + VisualFilledBonus;
-                tmpText.text = $"{filled}/{OriginalAmount}";
+                if (filled <= 0)
+                    tmpText.text = OriginalAmount.ToString();
+                else
+                    tmpText.text = $"{filled}/{OriginalAmount}";
             }
         }
+    }
+
+    public void SetTextVisible(bool visible)
+    {
+        if (tmpText != null)
+            tmpText.gameObject.SetActive(visible);
     }
 
     /// <summary>

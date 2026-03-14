@@ -233,27 +233,64 @@ public class PuzzleBoard : MonoBehaviour
         var animCfg = GameManager.Instance?.AnimConfig;
         int pumpCount = animCfg != null ? animCfg.PumpCount : 1;
         float pumpDelay = animCfg != null ? animCfg.PumpRepeatDelay : 0.1f;
-        float fillDuration = animCfg != null ? animCfg.FillDuration : 0.5f;
 
-        // Start gradual fill immediately (runs alongside pumps)
         int used = Mathf.Min(amount, piece.RemainingAmount);
-        int startBasketAmt = amount;
-        bool fillDone = false;
-        StartCoroutine(GradualFillAnimation(piece, basketComp, used, startBasketAmt, fillDuration, () => fillDone = true));
+        int totalTransferred = 0;
 
-        // Pump loop
         for (int p = 0; p < pumpCount; p++)
         {
+            // How much this pump transfers
+            int pumpShare;
+            if (p < pumpCount - 1)
+                pumpShare = used / pumpCount;
+            else
+                pumpShare = used - totalTransferred; // remainder on last pump
+
             if (basketAnimator != null)
                 basketAnimator.SetTrigger("pump");
 
+            // Start pipe pump (non-blocking — we tick gradual fill alongside it)
             Coroutine pumpCo = null;
             if (flexiblePipe != null)
                 pumpCo = flexiblePipe.PlayPump();
 
+            // SFX per pump iteration
+            GameManager.Instance?.PlayPieceFillSFX();
+
+            // Gradual fill during this pump iteration
+            int pumpStartTransferred = totalTransferred;
+            float elapsed = 0f;
+            float pumpDuration = flexiblePipe != null ? flexiblePipe.PumpDuration : 0.6f;
+            float fillSpeed = animCfg != null ? animCfg.FillSpeedMultiplier : 2f;
+            float fillTime = pumpDuration / Mathf.Max(fillSpeed, 0.1f);
+
+            while (elapsed < pumpDuration)
+            {
+                elapsed += Time.deltaTime;
+                float t = Mathf.Clamp01(elapsed / fillTime);
+                int targetTransferred = pumpStartTransferred + Mathf.RoundToInt(pumpShare * t);
+                int delta = targetTransferred - totalTransferred;
+
+                if (delta > 0)
+                {
+                    piece.IncrementalFill(delta);
+                    totalTransferred += delta;
+
+                    // Update basket display
+                    if (basketComp != null)
+                        basketComp.SetAmount(amount - totalTransferred);
+                }
+
+                // Update piece blendshape + text every frame
+                piece.UpdateFillVisual();
+                yield return null;
+            }
+
+            // Ensure pipe pump finishes
             if (pumpCo != null)
                 yield return pumpCo;
 
+            // Wait for basket animator to finish
             if (basketAnimator != null)
             {
                 yield return null;
@@ -267,9 +304,8 @@ public class PuzzleBoard : MonoBehaviour
                 yield return new WaitForSeconds(pumpDelay);
         }
 
-        // Wait for gradual fill to finish if pumps ended first
-        while (!fillDone)
-            yield return null;
+        // Finalize — check clear
+        piece.FinalizeFill();
 
         // Basket disappear VFX + SFX
         var disappearPos = stagingSlots.GetSlotVisual(slotIdx)?.transform.position ?? Vector3.zero;
@@ -277,46 +313,6 @@ public class PuzzleBoard : MonoBehaviour
         GameManager.Instance?.PlayBasketEmptySFX();
         stagingSlots.ClearSlot(slotIdx);
 
-        // Apply actual fill
-        int leftover = piece.Fill(amount);
-
-        if (leftover > 0 && !piece.IsCleared)
-        {
-            Debug.Log("[PuzzleBoard] LOSE — basket has leftover but can't fill piece!");
-            GameManager.Instance?.TriggerLose();
-        }
-
-        onDone?.Invoke();
-    }
-
-    IEnumerator GradualFillAnimation(PuzzlePiece piece, Basket basketComp, int used, int startBasketAmt, float duration, System.Action onDone)
-    {
-        int lastTransferred = 0;
-        float elapsed = 0f;
-
-        while (elapsed < duration)
-        {
-            elapsed += Time.deltaTime;
-            float t = Mathf.Clamp01(elapsed / duration);
-            int transferred = Mathf.RoundToInt(used * t);
-            int delta = transferred - lastTransferred;
-
-            if (delta > 0)
-            {
-                piece.VisualFilledBonus += delta;
-                lastTransferred = transferred;
-
-                if (basketComp != null)
-                    basketComp.SetAmount(startBasketAmt - transferred);
-
-                piece.SetDisplayText($"{piece.OriginalAmount - piece.RemainingAmount + piece.VisualFilledBonus}/{piece.OriginalAmount}");
-            }
-
-            yield return null;
-        }
-
-        // Reset visual bonus (actual Fill will update real amount)
-        piece.VisualFilledBonus -= used;
         onDone?.Invoke();
     }
 
@@ -376,7 +372,12 @@ public class PuzzleBoard : MonoBehaviour
     void UpdateActivePiece()
     {
         for (int i = 0; i < pieces.Count; i++)
+        {
             pieces[i].SetActive(i == currentPieceIndex && !pieces[i].IsCleared);
+            // Only current and next piece show text
+            bool showText = (i == currentPieceIndex || i == currentPieceIndex + 1) && !pieces[i].IsCleared;
+            pieces[i].SetTextVisible(showText);
+        }
     }
 
     int FindBasketColumn(Basket basket)
