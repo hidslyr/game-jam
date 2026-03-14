@@ -121,6 +121,9 @@ public class PuzzleBoard : MonoBehaviour
         // Disable picking on this basket (it's now heading to a slot)
         basket.IsPickable = false;
 
+        // SFX on basket tap
+        GameManager.Instance?.PlayBasketPickSFX();
+
         // Add to staging slots (fly animation starts here)
         int slotIdx = stagingSlots.AddBasket(basket.Color, basket.Amount, basket.gameObject);
         if (slotIdx == -1)
@@ -179,6 +182,7 @@ public class PuzzleBoard : MonoBehaviour
             MainUI.Instance?.UpdateDebugPiece(currentPieceIndex, piece.RemainingAmount, piece.IsCleared);
 
             // Basket always destroyed after filling (fully consumed or leftover)
+            GameManager.Instance?.PlayBasketEmptySFX();
             Destroy(basketGo);
 
             if (leftover > 0 && !piece.IsCleared)

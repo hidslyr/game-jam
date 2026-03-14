@@ -38,22 +38,11 @@ public static class LibraryContextMenus
         Debug.Log($"[VFXLibrary] BasketPickFX → {ps.name}");
     }
 
-    [MenuItem("Assets/Assign to VFX Library/Basket Fill FX")]
-    static void AssignBasketFillFX()
-    {
-        var lib = LoadOrCreateVFXLibrary();
-        var ps = GetParticleSystemFromSelection();
-        if (ps == null || lib == null) return;
-        lib.BasketFillFX = ps;
-        EditorUtility.SetDirty(lib);
-        AssetDatabase.SaveAssets();
-        Debug.Log($"[VFXLibrary] BasketFillFX → {ps.name}");
-    }
+
 
     // Validation — only show when a prefab with ParticleSystem is selected
     [MenuItem("Assets/Assign to VFX Library/Piece Clear FX", true)]
     [MenuItem("Assets/Assign to VFX Library/Basket Pick FX", true)]
-    [MenuItem("Assets/Assign to VFX Library/Basket Fill FX", true)]
     static bool ValidateParticleSystemSelection()
     {
         return GetParticleSystemFromSelection() != null;
@@ -85,16 +74,16 @@ public static class LibraryContextMenus
         Debug.Log($"[SFXLibrary] BasketPick → {clip.name}");
     }
 
-    [MenuItem("Assets/Assign to SFX Library/Basket Fill")]
-    static void AssignBasketFillSFX()
+    [MenuItem("Assets/Assign to SFX Library/Basket Empty")]
+    static void AssignBasketEmptySFX()
     {
         var lib = LoadOrCreateSFXLibrary();
         var clip = GetAudioClipFromSelection();
         if (clip == null || lib == null) return;
-        lib.BasketFill = clip;
+        lib.BasketEmpty = clip;
         EditorUtility.SetDirty(lib);
         AssetDatabase.SaveAssets();
-        Debug.Log($"[SFXLibrary] BasketFill → {clip.name}");
+        Debug.Log($"[SFXLibrary] BasketEmpty → {clip.name}");
     }
 
     [MenuItem("Assets/Assign to SFX Library/Win")]
@@ -137,7 +126,7 @@ public static class LibraryContextMenus
     [MenuItem("Assets/Assign to SFX Library/Piece Clear", true)]
     [MenuItem("Assets/Assign to SFX Library/Piece Fill", true)]
     [MenuItem("Assets/Assign to SFX Library/Basket Pick", true)]
-    [MenuItem("Assets/Assign to SFX Library/Basket Fill", true)]
+    [MenuItem("Assets/Assign to SFX Library/Basket Empty", true)]
     [MenuItem("Assets/Assign to SFX Library/Win", true)]
     [MenuItem("Assets/Assign to SFX Library/Lose", true)]
     static bool ValidateAudioClipSelection()
