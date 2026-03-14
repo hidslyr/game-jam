@@ -12,6 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 23d1b9739031040bb9c69c154f0caf6a, type: 3}
   m_Name: VFXLibrary
   m_EditorClassIdentifier: Assembly-CSharp::VFXLibrary
-  PieceClearFX: {fileID: 1429954232896169632, guid: 83036083a4ebcd34f98131bd3cf6f4d2, type: 3}
+  PieceClearFX: {fileID: 3384896629318458279, guid: 46fe83aefdf79214698f566766bbdd1a, type: 3}
   BasketPickFX: {fileID: 0}
-  BasketFillFX: {fileID: 0}
