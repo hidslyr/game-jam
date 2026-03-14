@@ -1,0 +1,1 @@
+1. There will be a pipe (flexible like a rope), connect from one point to current piece. Tell me how can I make it?

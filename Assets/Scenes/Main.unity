@@ -714,6 +714,7 @@ Transform:
   - {fileID: 2046888428}
   - {fileID: 884215280}
   - {fileID: 1774766731}
+  - {fileID: 915651210}
   m_Father: {fileID: 755564486}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &133227925
@@ -730,6 +731,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::StagingSlots
   SlotSpacingX: 1
   FlyInDuration: 0.5
+  FillingJumpDuration: 0.3
+  FillDelay: 0.2
   SlotPrefab: {fileID: 4966085820824304620, guid: b24a6ebf490cb4408af113fc5384db25, type: 3}
 --- !u!1 &205844139
 GameObject:
@@ -1855,6 +1858,37 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: a455c9f35a9f0f64caf1d52a6af1318a, type: 3}
   m_PrefabInstance: {fileID: 884215279}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &915651209
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 915651210}
+  m_Layer: 0
+  m_Name: PipeStartingPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &915651210
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 915651209}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -1.332, y: 0.869, z: 0.345}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 133227924}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1016194722
 GameObject:
   m_ObjectHideFlags: 0
@@ -3359,6 +3393,62 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1835319762}
   m_CullTransparentMesh: 1
+--- !u!1 &1957048561
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1957048563}
+  - component: {fileID: 1957048562}
+  m_Layer: 0
+  m_Name: FlexiblePipe
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1957048562
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1957048561}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 150246f3b3e784518bf15e5db53ac0fc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FlexiblePipe
+  SourcePoint: {fileID: 915651210}
+  Resolution: 20
+  SagAmount: 0.5
+  SmoothSpeed: 8
+  PipeWidth: 0.05
+  PipeMaterial: {fileID: 2100000, guid: 2c8affae331d41e4791fa8ffcf295667, type: 2}
+  PipeColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  SwayAmount: 0.1
+  SwaySpeed: 1.5
+  PumpDuration: 0.6
+  PumpBulgeMultiplier: 2
+  PumpBulgeWidth: 0.09
+--- !u!4 &1957048563
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1957048561}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.26831, y: 0, z: -2.52988}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1957655730
 GameObject:
   m_ObjectHideFlags: 0
@@ -3892,3 +3982,4 @@ SceneRoots:
   - {fileID: 691120631}
   - {fileID: 406634495}
   - {fileID: 755564486}
+  - {fileID: 1957048563}

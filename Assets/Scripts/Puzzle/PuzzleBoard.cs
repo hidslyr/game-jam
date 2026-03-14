@@ -18,6 +18,7 @@ public class PuzzleBoard : MonoBehaviour
     BasketGrid basketGrid;
     StagingSlots stagingSlots;
     Transform puzzleChainParent;
+    FlexiblePipe flexiblePipe;
 
     // Runtime state
     List<PuzzlePiece> pieces = new List<PuzzlePiece>();
@@ -36,6 +37,7 @@ public class PuzzleBoard : MonoBehaviour
         // Find child containers
         basketGrid = GetComponentInChildren<BasketGrid>();
         stagingSlots = GetComponentInChildren<StagingSlots>();
+        flexiblePipe = FindAnyObjectByType<FlexiblePipe>();
 
         var chainGo = transform.Find("PuzzleChain");
         if (chainGo != null) puzzleChainParent = chainGo;
@@ -166,7 +168,11 @@ public class PuzzleBoard : MonoBehaviour
             // Short delay before filling
             yield return new WaitForSeconds(stagingSlots.FillDelay);
 
-            // Fill the piece
+            // Play pump animation through pipe
+            if (flexiblePipe != null)
+                yield return flexiblePipe.PlayPump();
+
+            // Fill the piece (BlendShape updates after pump finishes)
             int leftover = piece.Fill(slotAmount);
 
             // Update debug UI
@@ -222,6 +228,16 @@ public class PuzzleBoard : MonoBehaviour
                 GameManager.Instance?.TriggerLose();
             }
         }
+    }
+
+    /// <summary>
+    /// Returns the current active piece (used by FlexiblePipe).
+    /// </summary>
+    public PuzzlePiece GetCurrentPiece()
+    {
+        if (currentPieceIndex >= 0 && currentPieceIndex < pieces.Count)
+            return pieces[currentPieceIndex];
+        return null;
     }
 
     void UpdateActivePiece()
