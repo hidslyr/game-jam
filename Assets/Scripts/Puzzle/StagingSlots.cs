@@ -11,6 +11,7 @@ public class StagingSlots : MonoBehaviour
     [Header("Slot Layout")]
     public float SlotSpacingX = 1.2f;
     public float FlyInDuration = 0.5f;
+    public float JumpPower = 2f;
 
     [Header("Prefab")]
     public GameObject SlotPrefab; // Visual slot outline
@@ -65,11 +66,11 @@ public class StagingSlots : MonoBehaviour
         slots[idx].Amount = amount;
         slots[idx].Visual = basketGo;
 
-        // Reparent and animate fly to slot position
+        // Reparent and jump to slot
         basketGo.transform.SetParent(transform);
-        var targetPos = GetSlotPosition(idx);
-        targetPos.y = 0.1f; // Slight Y offset so basket sits above slot (top-down camera)
-        basketGo.transform.DOLocalMove(targetPos, FlyInDuration).SetEase(Ease.OutBack);
+        var jumpTo = basketGo.GetComponent<JellyClash.Scripts.Components.JumpTo>();
+        if (jumpTo != null && slotTransforms[idx] != null)
+            jumpTo.Jump(slotTransforms[idx], JumpPower, FlyInDuration);
 
         return idx;
     }
