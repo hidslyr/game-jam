@@ -29,7 +29,6 @@ public class PuzzlePiece : MonoBehaviour
     SkinnedMeshRenderer skinnedMeshRenderer;
     TextMeshPro tmpText;
     Transform tmpTextTransform; // For ignoring parent rotation
-    MaterialPropertyBlock propBlock;
 
     public void Initialize(GameColor color, int amount)
     {
@@ -38,10 +37,9 @@ public class PuzzlePiece : MonoBehaviour
         RemainingAmount = amount;
         IsCleared = false;
 
-        // Material color (on same object as PuzzlePiece)
+        // Material swap (on same object as PuzzlePiece)
         meshRenderer = GetComponent<Renderer>();
-        propBlock = new MaterialPropertyBlock();
-        UpdateMaterialColor(color);
+        SwapMaterial(color);
 
         // SkinnedMeshRenderer for BlendShape (may be on this or child)
         skinnedMeshRenderer = GetComponentInChildren<SkinnedMeshRenderer>();
@@ -117,10 +115,25 @@ public class PuzzlePiece : MonoBehaviour
         transform.localScale = active ? Vector3.one * 1.1f : Vector3.one;
     }
 
-    void UpdateMaterialColor(GameColor color)
+    void SwapMaterial(GameColor color)
     {
         if (meshRenderer == null) return;
-        meshRenderer.material.color = color.ToColor();
+
+        string matName;
+        switch (color)
+        {
+            case GameColor.Red:   matName = "mat_Balloon_red"; break;
+            case GameColor.Green: matName = "mat_Balloon_green"; break;
+            case GameColor.Blue:  matName = "mat_Balloon_blue"; break;
+            default:              matName = "mat_Balloon_base"; break;
+        }
+
+        // Materials under Assets/Resources/GameJam/Art/Balloon/
+        var mat = Resources.Load<Material>($"GameJam/Art/Balloon/{matName}");
+        if (mat != null)
+            meshRenderer.material = mat;
+        else
+            Debug.LogWarning($"[PuzzlePiece] Material not found: GameJam/Art/Balloon/{matName}");
     }
 
     void UpdateBlendShape(float fillPercent, bool instant)
