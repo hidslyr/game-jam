@@ -114,6 +114,13 @@ public class PuzzleBoard : MonoBehaviour
 
     IEnumerator HandleBasketPicked(Basket basket)
     {
+        // Check if there's an empty staging slot BEFORE removing from grid
+        if (stagingSlots.IsFull())
+        {
+            Debug.LogWarning("[PuzzleBoard] No empty slot — basket stays in grid.");
+            yield break;
+        }
+
         // Find column and remove from grid
         int col = FindBasketColumn(basket);
         if (col >= 0)
