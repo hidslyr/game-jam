@@ -13,7 +13,7 @@ public class Basket : MonoBehaviour
     public int Amount { get; private set; }
     public bool IsPickable { get; set; }
 
-    SpriteRenderer spriteRenderer;
+    Renderer meshRenderer;
     TextMeshPro tmpText;
 
     public void Initialize(GameColor color, int amount)
@@ -22,12 +22,10 @@ public class Basket : MonoBehaviour
         Amount = amount;
         IsPickable = false;
 
-        spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+        meshRenderer = GetComponentInChildren<Renderer>();
         tmpText = GetComponentInChildren<TextMeshPro>();
 
-        if (spriteRenderer != null)
-            spriteRenderer.color = color.ToColor();
-
+        SwapMaterial(color);
         UpdateDisplay();
     }
 
@@ -60,5 +58,34 @@ public class Basket : MonoBehaviour
     {
         if (tmpText != null)
             tmpText.text = Amount.ToString();
+    }
+
+    void SwapMaterial(GameColor color)
+    {
+        if (meshRenderer == null) return;
+
+        string matName;
+        switch (color)
+        {
+            case GameColor.Red:    matName = "mat_box_red"; break;
+            case GameColor.Green:  matName = "mat_box_green"; break;
+            case GameColor.Blue:   matName = "mat_box_blue"; break;
+            case GameColor.Yellow: matName = "mat_box_yellow"; break;
+            case GameColor.Purple: matName = "mat_box_purple"; break;
+            default:               matName = "mat_box_base"; break;
+        }
+
+        var mat = Resources.Load<Material>($"GameJam/Art/Box/{matName}");
+        if (mat != null)
+        {
+            // Swap only the first material, leave the rest
+            var mats = meshRenderer.materials;
+            mats[0] = mat;
+            meshRenderer.materials = mats;
+        }
+        else
+        {
+            Debug.LogWarning($"[Basket] Material not found: GameJam/Art/Box/{matName}");
+        }
     }
 }
