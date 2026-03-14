@@ -77,6 +77,12 @@ public class PuzzlePiece : MonoBehaviour
         UpdateBlendShape(0f, true); // Start at 0% fill
     }
 
+    void LateUpdate()
+    {
+        if (tmpTextTransform != null)
+            tmpTextTransform.rotation = Quaternion.Euler(25f, 0f, 0f);
+    }
+
     /// <summary>
     /// Fill this piece with the given amount.
     /// Returns leftover (0 = basket fully consumed, >0 = piece cleared with basket remainder).
