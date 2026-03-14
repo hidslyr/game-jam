@@ -3747,12 +3747,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FlexiblePipe
   SourcePoint: {fileID: 915651210}
-  ActiveResolution: 16
+  ActiveResolution: 40
   ActiveSagAmount: 0.5
-  ActiveSwayAmount: 0.1
-  SkeletonResolution: 4
-  SkeletonSagAmount: 0
-  SkeletonSwayAmount: 0
+  ActiveSwayAmount: 0.04
+  SkeletonResolution: 100
+  SkeletonSagAmount: 0.1
+  SkeletonSwayAmount: 0.01
   SwaySpeed: 1.5
   PipeWidth: 0.15
   PipeMaterial: {fileID: 2100000, guid: 2c8affae331d41e4791fa8ffcf295667, type: 2}

@@ -19,7 +19,7 @@ public class FlexiblePipe : MonoBehaviour
     public float ActiveSwayAmount = 0.05f;
 
     [Header("Skeleton Frame (Part 2)")]
-    public int SkeletonResolution = 8;
+    public int SkeletonResolution = 20;
     public float SkeletonSagAmount = 0f;
     public float SkeletonSwayAmount = 0.01f;
 
@@ -36,8 +36,8 @@ public class FlexiblePipe : MonoBehaviour
 
     // Part 1: active pipe (extends through cleared pieces)
     LineRenderer activePipe;
-    // Part 2: skeleton segments (one LineRenderer per piece-to-piece)
-    List<LineRenderer> skeletonSegments = new List<LineRenderer>();
+    // Part 2: single skeleton spline through all connect points
+    LineRenderer skeletonPipe;
 
     // Cached piece ConnectPoint positions (set once on init)
     List<Vector3> piecePositions = new List<Vector3>();
@@ -84,12 +84,8 @@ public class FlexiblePipe : MonoBehaviour
                 piecePositions.Add(endPoint.position);
         }
 
-        // Create skeleton segments (piece[i] → piece[i+1], including EndPoint)
-        for (int i = 1; i < piecePositions.Count - 1; i++)
-        {
-            var lr = CreateLineRenderer($"Skeleton_{i}");
-            skeletonSegments.Add(lr);
-        }
+        // Single skeleton spline LineRenderer
+        skeletonPipe = CreateLineRenderer("SkeletonSpline");
 
         clearedCount = 0;
     }
@@ -103,15 +99,8 @@ public class FlexiblePipe : MonoBehaviour
         // ── Part 1: Active pipe (always source → first piece only) ──
         UpdateMultiSegmentPipe(activePipe, 0, 1, time, true, 0);
 
-        // ── Part 2: Skeleton (all piece-to-piece segments, always visible) ──
-        for (int i = 0; i < skeletonSegments.Count; i++)
-        {
-            int segStartPieceIdx = i + 1;
-            bool pumpThrough = activePumps.Count > 0 && segStartPieceIdx <= clearedCount;
-
-            UpdateSingleSegment(skeletonSegments[i], piecePositions[segStartPieceIdx],
-                piecePositions[segStartPieceIdx + 1], time, i, pumpThrough, segStartPieceIdx);
-        }
+        // ── Part 2: Skeleton spline (all connect points as one smooth curve) ──
+        UpdateSkeletonSpline(time);
     }
 
     /// <summary>
@@ -230,39 +219,53 @@ public class FlexiblePipe : MonoBehaviour
     }
 
     /// <summary>
-    /// Render a straight segment (skeleton frame). Supports pump bulge pass-through.
+    /// Render entire skeleton as one Catmull-Rom spline through all connect points.
     /// </summary>
-    void UpdateSingleSegment(LineRenderer lr, Vector3 start, Vector3 end, float time, int segIndex,
-        bool pumpThrough, int pumpSegIndex)
+    void UpdateSkeletonSpline(float time)
     {
-        if (SkeletonSagAmount > 0f || SkeletonSwayAmount > 0f)
+        if (skeletonPipe == null || piecePositions.Count < 3) return;
+
+        // Skeleton runs from piecePositions[1] to piecePositions[last]
+        int segCount = piecePositions.Count - 2; // number of segments
+        int pointsPerSeg = SkeletonResolution;
+        int totalPoints = segCount * pointsPerSeg + 1;
+
+        skeletonPipe.positionCount = totalPoints;
+        var widthCurve = new AnimationCurve();
+        int pointIdx = 0;
+
+        for (int seg = 0; seg < segCount; seg++)
         {
-            lr.positionCount = SkeletonResolution;
-            Vector3 mid = (start + end) * 0.5f;
-            mid.y -= SkeletonSagAmount;
+            int idx = seg + 1; // piecePositions index for segment start
+            Vector3 p1 = piecePositions[idx];
+            Vector3 p2 = piecePositions[idx + 1];
+            // Extrapolate phantom points at boundaries for smooth tangents
+            Vector3 p0 = idx - 1 >= 0 ? piecePositions[idx - 1] : p1 + (p1 - p2);
+            Vector3 p3 = idx + 2 < piecePositions.Count ? piecePositions[idx + 2] : p2 + (p2 - p1);
 
-            int totalPumpSegments = 1 + clearedCount;
-            var widthCurve = new AnimationCurve();
-
-            for (int i = 0; i < SkeletonResolution; i++)
+            int steps = (seg < segCount - 1) ? pointsPerSeg : pointsPerSeg + 1;
+            for (int i = 0; i < steps; i++)
             {
-                float t = i / (float)(SkeletonResolution - 1);
-                Vector3 point = Vector3.Lerp(start, end, t);
-                point.y += (1 - t) * t * 4f * (mid.y - (start.y + (end.y - start.y) * t));
+                float t = i / (float)pointsPerSeg;
+                Vector3 point = CatmullRom(p0, p1, p2, p3, t);
 
+                // Optional sway
                 if (SkeletonSwayAmount > 0f)
                 {
                     float swayStrength = Mathf.Sin(t * Mathf.PI) * SkeletonSwayAmount;
-                    point.x += (Mathf.PerlinNoise(time + (segIndex * SkeletonResolution + i) * 0.3f, 0.5f) - 0.5f) * swayStrength;
-                    point.z += (Mathf.PerlinNoise(0.5f, time + (segIndex * SkeletonResolution + i) * 0.3f) - 0.5f) * swayStrength;
+                    point.x += (Mathf.PerlinNoise(time + (seg * pointsPerSeg + i) * 0.3f, 0.5f) - 0.5f) * swayStrength;
+                    point.z += (Mathf.PerlinNoise(0.5f, time + (seg * pointsPerSeg + i) * 0.3f) - 0.5f) * swayStrength;
                 }
 
-                lr.SetPosition(i, point);
+                skeletonPipe.SetPosition(pointIdx, point);
 
+                // Width + pump bulge
                 float width = PipeWidth;
-                if (pumpThrough && activePumps.Count > 0 && totalPumpSegments > 0)
+                bool pumpThrough = activePumps.Count > 0 && idx <= clearedCount;
+                if (pumpThrough)
                 {
-                    float pumpT = (pumpSegIndex + t) / totalPumpSegments;
+                    int totalPumpSegments = 1 + clearedCount;
+                    float pumpT = (idx + t) / totalPumpSegments;
                     float totalBulge = 0f;
                     for (int p = 0; p < activePumps.Count; p++)
                     {
@@ -272,44 +275,29 @@ public class FlexiblePipe : MonoBehaviour
                     }
                     width += PipeWidth * (PumpBulgeMultiplier - 1f) * totalBulge;
                 }
-                widthCurve.AddKey(t, width);
-            }
-            lr.widthCurve = widthCurve;
-        }
-        else
-        {
-            // Pure straight line
-            lr.positionCount = 2;
-            lr.SetPosition(0, start);
-            lr.SetPosition(1, end);
 
-            if (pumpThrough && activePumps.Count > 0)
-            {
-                int totalPumpSegments = 1 + clearedCount;
-                var widthCurve = new AnimationCurve();
-                for (int i = 0; i < 2; i++)
-                {
-                    float t = (float)i;
-                    float pumpT = (pumpSegIndex + t) / totalPumpSegments;
-                    float width = PipeWidth;
-                    float totalBulge = 0f;
-                    for (int p = 0; p < activePumps.Count; p++)
-                    {
-                        float dist = Mathf.Abs(pumpT - activePumps[p]);
-                        float bulge = Mathf.Exp(-(dist * dist) / (2f * PumpBulgeWidth * PumpBulgeWidth));
-                        totalBulge = Mathf.Max(totalBulge, bulge);
-                    }
-                    width += PipeWidth * (PumpBulgeMultiplier - 1f) * totalBulge;
-                    widthCurve.AddKey(t, width);
-                }
-                lr.widthCurve = widthCurve;
-            }
-            else
-            {
-                lr.startWidth = PipeWidth;
-                lr.endWidth = PipeWidth;
+                float globalT = (float)pointIdx / (totalPoints - 1);
+                widthCurve.AddKey(globalT, width);
+                pointIdx++;
             }
         }
+
+        skeletonPipe.widthCurve = widthCurve;
+    }
+
+    /// <summary>
+    /// Catmull-Rom spline interpolation between p1 and p2, using p0 and p3 as tangent guides.
+    /// </summary>
+    static Vector3 CatmullRom(Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3, float t)
+    {
+        float t2 = t * t;
+        float t3 = t2 * t;
+        return 0.5f * (
+            (2f * p1) +
+            (-p0 + p2) * t +
+            (2f * p0 - 5f * p1 + 4f * p2 - p3) * t2 +
+            (-p0 + 3f * p1 - 3f * p2 + p3) * t3
+        );
     }
 
     // ────── Setup ──────
@@ -325,8 +313,8 @@ public class FlexiblePipe : MonoBehaviour
         lr.endWidth = PipeWidth;
         lr.startColor = PipeColor;
         lr.endColor = PipeColor;
-        lr.numCornerVertices = 4;
-        lr.numCapVertices = 4;
+        lr.numCornerVertices = 20;
+        lr.numCapVertices = 20;
         lr.useWorldSpace = true;
 
         if (PipeMaterial != null)
