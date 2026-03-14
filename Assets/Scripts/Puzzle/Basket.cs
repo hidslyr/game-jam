@@ -7,7 +7,6 @@ using UnityEngine.InputSystem;
 /// Displays color + amount. Clickable when IsPickable = true.
 /// Click detection via Physics2D Raycast from Mouse.current.
 /// </summary>
-[RequireComponent(typeof(BoxCollider2D))]
 public class Basket : MonoBehaviour
 {
     public GameColor Color { get; private set; }
@@ -47,12 +46,11 @@ public class Basket : MonoBehaviour
         if (Mouse.current == null) return;
         if (!Mouse.current.leftButton.wasPressedThisFrame) return;
 
-        // Raycast from mouse position
+        // Raycast from mouse position (3D)
         var mousePos = Mouse.current.position.ReadValue();
-        var worldPos = Camera.main.ScreenToWorldPoint(mousePos);
-        var hit = Physics2D.Raycast(worldPos, Vector2.zero);
+        var ray = Camera.main.ScreenPointToRay(mousePos);
 
-        if (hit.collider != null && hit.collider.gameObject == gameObject)
+        if (Physics.Raycast(ray, out RaycastHit hit) && hit.collider.gameObject == gameObject)
         {
             PuzzleBoard.Instance?.OnBasketPicked(this);
         }
