@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Puzzle Basket Prototype</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: #1a1a2e;
+    color: #eee;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+  }
+  h1 { font-size: 1.4rem; margin-bottom: 6px; color: #e94560; }
+  .subtitle { font-size: 0.8rem; color: #888; margin-bottom: 16px; }
+
+  .game-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    max-width: 600px;
+    width: 100%;
+  }
+  .section-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #666;
+    margin-bottom: 4px;
+  }
+
+  /* Puzzle Pieces */
+  .puzzle-chain { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+  .piece {
+    width: 70px; height: 70px; border-radius: 10px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    font-weight: bold; font-size: 1.2rem;
+    border: 3px solid rgba(255,255,255,0.2);
+    transition: all 0.4s ease;
+  }
+  .piece.active { border-color: #fff; box-shadow: 0 0 16px rgba(255,255,255,0.3); transform: scale(1.1); }
+  .piece.cleared { opacity: 0.3; transform: scale(0.85); border-color: transparent; }
+  .piece .piece-label { font-size: 0.6rem; opacity: 0.7; }
+
+  /* Staging Slots */
+  .slots-area { display: flex; gap: 8px; justify-content: center; }
+  .slot {
+    width: 56px; height: 56px;
+    border: 2px dashed rgba(255,255,255,0.15);
+    border-radius: 8px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    font-size: 0.9rem; font-weight: bold;
+    transition: all 0.4s ease;
+    background: rgba(255,255,255,0.03);
+  }
+  .slot.filled { border-style: solid; border-color: rgba(255,255,255,0.3); }
+  .slot .slot-label { font-size: 0.55rem; opacity: 0.6; }
+
+  /* Basket Grid — displayed as columns */
+  .grid-area { display: flex; gap: 6px; align-items: flex-start; justify-content: center; }
+  .grid-column { display: flex; flex-direction: column; gap: 6px; align-items: center; }
+  .col-label { font-size: 0.55rem; color: #555; margin-bottom: 2px; }
+  .basket {
+    width: 56px; height: 56px; border-radius: 8px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    font-weight: bold; font-size: 1rem;
+    transition: all 0.3s ease;
+    border: 2px solid rgba(0,0,0,0.2);
+  }
+  .basket.top { cursor: pointer; }
+  .basket.top:hover { transform: scale(1.1); box-shadow: 0 4px 16px rgba(0,0,0,0.4); }
+  .basket.locked { cursor: not-allowed; opacity: 0.5; }
+  .basket .basket-label { font-size: 0.55rem; opacity: 0.7; }
+  .top-indicator {
+    font-size: 0.6rem; color: #e94560; margin-bottom: 2px;
+    animation: pulse 1.5s infinite;
+  }
+
+  /* Colors */
+  .color-R { background: #e94560; }
+  .color-G { background: #0f9b58; }
+  .color-B { background: #4285f4; }
+  .piece.color-R { background: rgba(233,69,96,0.25); }
+  .piece.color-G { background: rgba(15,155,88,0.25); }
+  .piece.color-B { background: rgba(66,133,244,0.25); }
+  .piece.active.color-R { background: rgba(233,69,96,0.45); }
+  .piece.active.color-G { background: rgba(15,155,88,0.45); }
+  .piece.active.color-B { background: rgba(66,133,244,0.45); }
+  .slot.filled.color-R { background: rgba(233,69,96,0.35); }
+  .slot.filled.color-G { background: rgba(15,155,88,0.35); }
+  .slot.filled.color-B { background: rgba(66,133,244,0.35); }
+
+  /* Status */
+  .status-bar { display: flex; gap: 16px; font-size: 0.85rem; color: #aaa; }
+
+  /* Overlay */
+  .overlay {
+    display: none; position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.8);
+    align-items: center; justify-content: center;
+    flex-direction: column; gap: 16px; z-index: 10;
+  }
+  .overlay.show { display: flex; }
+  .overlay h2 { font-size: 2rem; }
+  .overlay .win { color: #0f9b58; }
+  .overlay .lose { color: #e94560; }
+  .btn {
+    padding: 10px 28px; border: none; border-radius: 8px;
+    background: #e94560; color: #fff; font-size: 1rem;
+    cursor: pointer; transition: background 0.2s;
+  }
+  .btn:hover { background: #c73650; }
+
+  @keyframes flyUp {
+    0% { transform: translateY(0); opacity: 1; }
+    100% { transform: translateY(-80px); opacity: 0; }
+  }
+  @keyframes fillPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+    100% { transform: scale(1); }
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+  .fly-anim { animation: flyUp 0.5s ease-in forwards; }
+  .fill-anim { animation: fillPulse 0.4s ease; }
+
+  .legend { display: flex; gap: 16px; font-size: 0.7rem; color: #666; margin-top: 8px; }
+  .legend span { display: flex; align-items: center; gap: 4px; }
+  .legend .swatch { width: 12px; height: 12px; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<h1>🧩 Puzzle Basket Prototype</h1>
+<p class="subtitle">Click the top basket in each column to pick it → auto-fills matching puzzle piece</p>
+
+<div class="game-container">
+  <div class="section-label">Puzzle Pieces (clear in order →)</div>
+  <div class="puzzle-chain" id="puzzleChain"></div>
+
+  <div class="section-label" style="margin-top:8px">Staging Slots</div>
+  <div class="slots-area" id="slotsArea"></div>
+
+  <div class="section-label" style="margin-top:8px">Basket Grid (pick top of each column ↑)</div>
+  <div class="grid-area" id="gridArea"></div>
+
+  <div class="status-bar" id="statusBar"></div>
+  <div class="legend">
+    <span><div class="swatch color-G"></div> Green</span>
+    <span><div class="swatch color-R"></div> Red</span>
+    <span><div class="swatch color-B"></div> Blue</span>
+  </div>
+</div>
+
+<div class="overlay" id="overlay">
+  <h2 id="overlayTitle"></h2>
+  <p id="overlayMsg" style="color:#aaa"></p>
+  <button class="btn" onclick="restartGame()">Play Again</button>
+</div>
+
+<script>
+// === LEVEL DATA (from level-format.md) ===
+// Rows: [G-2, G-2, G-2], [R-4, R-2], [B-6]
+// Converted to columns (top-to-bottom per column):
+//   Col 0: G-2 (top), R-4, B-6 (bottom)
+//   Col 1: G-2 (top), R-2 (bottom)
+//   Col 2: G-2 (top, only)
+const LEVEL = {
+  goal: [ {color:'G', amount:6}, {color:'R', amount:6}, {color:'B', amount:6} ],
+  // Define as rows first, will convert to columns
+  rows: [
+    [ {color:'G',amount:2}, {color:'G',amount:2}, {color:'G',amount:2} ],
+    [ {color:'R',amount:4}, {color:'R',amount:2} ],
+    [ {color:'B',amount:6} ]
+  ],
+  slotCount: 5
+};
+
+// Convert rows to columns (column-based structure for gravity)
+function rowsToColumns(rows) {
+  const maxCols = Math.max(...rows.map(r => r.length));
+  const columns = [];
+  for (let c = 0; c < maxCols; c++) {
+    const col = [];
+    for (let r = 0; r < rows.length; r++) {
+      if (c < rows[r].length) {
+        col.push({...rows[r][c]});
+      }
+    }
+    columns.push(col);
+  }
+  return columns;
+}
+
+// === STATE ===
+let pieces = [];
+let slots = [];
+let columns = [];  // columns[colIdx][depth] — depth 0 = top
+let currentPieceIndex = 0;
+let gameOver = false;
+
+function initGame() {
+  gameOver = false;
+  document.getElementById('overlay').classList.remove('show');
+
+  pieces = LEVEL.goal.map((p, i) => ({...p, original: p.amount, cleared: false, index: i}));
+  slots = Array.from({length: LEVEL.slotCount}, () => ({color: null, amount: 0, filled: false}));
+  columns = rowsToColumns(LEVEL.rows);
+  currentPieceIndex = 0;
+  render();
+}
+
+function render() {
+  renderPieces();
+  renderSlots();
+  renderGrid();
+  renderStatus();
+}
+
+function renderPieces() {
+  const el = document.getElementById('puzzleChain');
+  el.innerHTML = pieces.map((p, i) => {
+    const cls = ['piece', `color-${p.color}`];
+    if (i === currentPieceIndex && !p.cleared) cls.push('active');
+    if (p.cleared) cls.push('cleared');
+    return `<div class="${cls.join(' ')}" id="piece-${i}">
+      <span class="piece-label">${p.cleared ? '✓' : p.color}</span>
+      <span>${p.cleared ? '0' : p.amount}</span>
+    </div>`;
+  }).join('');
+}
+
+function renderSlots() {
+  const el = document.getElementById('slotsArea');
+  el.innerHTML = slots.map((s, i) => {
+    const cls = ['slot'];
+    if (s.filled) cls.push('filled', `color-${s.color}`);
+    return `<div class="${cls.join(' ')}" id="slot-${i}">
+      ${s.filled ? `<span>${s.amount}</span><span class="slot-label">${s.color}</span>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function renderGrid() {
+  const el = document.getElementById('gridArea');
+  el.innerHTML = columns.map((col, colIdx) => {
+    if (col.length === 0) return '';
+    const basketsHtml = col.map((b, depth) => {
+      const isTop = depth === 0;
+      const cls = ['basket', `color-${b.color}`];
+      cls.push(isTop ? 'top' : 'locked');
+      const onclick = isTop && !gameOver ? `onclick="pickBasket(${colIdx})"` : '';
+      return `<div class="${cls.join(' ')}" ${onclick} id="basket-${colIdx}-${depth}">
+        <span>${b.amount}</span>
+        <span class="basket-label">${b.color}</span>
+      </div>`;
+    }).join('');
+
+    return `<div class="grid-column">
+      <span class="top-indicator">▲</span>
+      ${basketsHtml}
+    </div>`;
+  }).join('');
+}
+
+function renderStatus() {
+  const slotsUsed = slots.filter(s => s.filled).length;
+  const piecesCleared = pieces.filter(p => p.cleared).length;
+  const basketsLeft = columns.reduce((sum, col) => sum + col.length, 0);
+  document.getElementById('statusBar').innerHTML = `
+    <span>🧩 Pieces: ${piecesCleared}/${pieces.length}</span>
+    <span>🎰 Slots: ${slotsUsed}/${slots.length}</span>
+    <span>📦 Baskets: ${basketsLeft}</span>
+  `;
+}
+
+function pickBasket(colIdx) {
+  if (gameOver) return;
+  if (columns[colIdx].length === 0) return;
+
+  // Animate top basket
+  const el = document.getElementById(`basket-${colIdx}-0`);
+  if (el) el.classList.add('fly-anim');
+
+  setTimeout(() => {
+    // Remove top basket from column (gravity: everything below rises up)
+    const basket = columns[colIdx].shift();
+
+    // Place in first empty slot
+    const slotIdx = slots.findIndex(s => !s.filled);
+    if (slotIdx === -1) {
+      endGame(false);
+      return;
+    }
+    slots[slotIdx] = { color: basket.color, amount: basket.amount, filled: true };
+
+    // Auto-fill
+    autoFill();
+    render();
+
+    // Check win/lose
+    checkWinLose();
+  }, 400);
+}
+
+function autoFill() {
+  let changed = true;
+  while (changed) {
+    changed = false;
+    if (currentPieceIndex >= pieces.length) break;
+    const piece = pieces[currentPieceIndex];
+    if (piece.cleared) { currentPieceIndex++; changed = true; continue; }
+
+    const matchIdx = slots.findIndex(s => s.filled && s.color === piece.color);
+    if (matchIdx === -1) break;
+
+    const slot = slots[matchIdx];
+    const used = Math.min(slot.amount, piece.amount);
+    piece.amount -= used;
+    slot.amount -= used;
+
+    // Always re-check after any fill operation
+    changed = true;
+
+    if (slot.amount <= 0) {
+      slots[matchIdx] = {color: null, amount: 0, filled: false};
+    }
+    if (piece.amount <= 0) {
+      piece.cleared = true;
+      piece.amount = 0;
+      currentPieceIndex++;
+      // Continue loop — re-check all slots against new piece
+    }
+  }
+}
+
+function checkWinLose() {
+  if (pieces.every(p => p.cleared)) {
+    setTimeout(() => endGame(true), 500);
+    return;
+  }
+  // Lose: all slots full AND no auto-fill possible
+  if (slots.every(s => s.filled)) {
+    const piece = pieces[currentPieceIndex];
+    const canFill = piece && !piece.cleared && slots.some(s => s.filled && s.color === piece.color);
+    if (!canFill) {
+      setTimeout(() => endGame(false), 500);
+    }
+  }
+}
+
+function endGame(win) {
+  gameOver = true;
+  const overlay = document.getElementById('overlay');
+  overlay.classList.add('show');
+  document.getElementById('overlayTitle').innerHTML = win
+    ? '<span class="win">🎉 You Win!</span>'
+    : '<span class="lose">💀 Game Over</span>';
+  document.getElementById('overlayMsg').textContent = win
+    ? 'All puzzle pieces cleared!'
+    : 'All slots full — no moves left.';
+}
+
+function restartGame() { initGame(); }
+initGame();
+</script>
+</body>
+</html>
