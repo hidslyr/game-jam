@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: SFXLibrary
   m_EditorClassIdentifier: Assembly-CSharp::SFXLibrary
   PieceClear: {fileID: 8300000, guid: 0e43c3776e4a547768d062300a526ea3, type: 3}
+  PieceFill: {fileID: 8300000, guid: 0e43c3776e4a547768d062300a526ea3, type: 3}
   BasketPick: {fileID: 0}
   BasketFill: {fileID: 0}
   Win: {fileID: 0}

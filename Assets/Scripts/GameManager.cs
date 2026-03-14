@@ -65,6 +65,15 @@ public class GameManager : MonoBehaviour
             audioSource.PlayOneShot(sfxLibrary.PieceClear);
     }
 
+    /// <summary>
+    /// Play SFX when piece visual updates (blendshape fill).
+    /// </summary>
+    public void PlayPieceFillSFX()
+    {
+        if (sfxLibrary != null && sfxLibrary.PieceFill != null && audioSource != null)
+            audioSource.PlayOneShot(sfxLibrary.PieceFill);
+    }
+
     void InitLevel()
     {
         int targetLevel = Global.Instance != null ? Global.Instance.CurrentLevel : 1;

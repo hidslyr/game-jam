@@ -121,8 +121,21 @@ public static class LibraryContextMenus
         Debug.Log($"[SFXLibrary] Lose → {clip.name}");
     }
 
+    [MenuItem("Assets/Assign to SFX Library/Piece Fill")]
+    static void AssignPieceFillSFX()
+    {
+        var lib = LoadOrCreateSFXLibrary();
+        var clip = GetAudioClipFromSelection();
+        if (clip == null || lib == null) return;
+        lib.PieceFill = clip;
+        EditorUtility.SetDirty(lib);
+        AssetDatabase.SaveAssets();
+        Debug.Log($"[SFXLibrary] PieceFill → {clip.name}");
+    }
+
     // Validation — only show when an AudioClip is selected
     [MenuItem("Assets/Assign to SFX Library/Piece Clear", true)]
+    [MenuItem("Assets/Assign to SFX Library/Piece Fill", true)]
     [MenuItem("Assets/Assign to SFX Library/Basket Pick", true)]
     [MenuItem("Assets/Assign to SFX Library/Basket Fill", true)]
     [MenuItem("Assets/Assign to SFX Library/Win", true)]

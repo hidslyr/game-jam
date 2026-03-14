@@ -9,6 +9,7 @@ public class SFXLibrary : ScriptableObject
 {
     [Header("Piece SFX")]
     public AudioClip PieceClear;
+    public AudioClip PieceFill;
 
     [Header("Basket SFX")]
     public AudioClip BasketPick;

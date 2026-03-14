@@ -85,6 +85,7 @@ public class PuzzlePiece : MonoBehaviour
 
         UpdateDisplay();
         UpdateBlendShape(FillPercentage, false);
+        GameManager.Instance?.PlayPieceFillSFX();
 
         if (RemainingAmount <= 0)
         {
