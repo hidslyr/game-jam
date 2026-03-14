@@ -1,0 +1,287 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ba10e213642414bd19235df544b9ad6c, type: 3}
+  m_Name: LevelData 3
+  m_EditorClassIdentifier: Assembly-CSharp::LevelData
+  LevelNumber: 3
+  LevelName: Level 3
+  PuzzlePieces:
+  - Color: 0
+    Amount: 30
+  - Color: 3
+    Amount: 30
+  - Color: 2
+    Amount: 30
+  - Color: 1
+    Amount: 30
+  - Color: 4
+    Amount: 30
+  - Color: 0
+    Amount: 30
+  - Color: 2
+    Amount: 30
+  - Color: 3
+    Amount: 40
+  - Color: 1
+    Amount: 40
+  - Color: 4
+    Amount: 30
+  GridRows:
+  - Baskets:
+    - IsEmpty: 0
+      Color: 2
+      Amount: 10
+    - IsEmpty: 0
+      Color: 0
+      Amount: 10
+    - IsEmpty: 0
+      Color: 3
+      Amount: 10
+    - IsEmpty: 0
+      Color: 1
+      Amount: 10
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+  - Baskets:
+    - IsEmpty: 0
+      Color: 4
+      Amount: 10
+    - IsEmpty: 0
+      Color: 2
+      Amount: 10
+    - IsEmpty: 0
+      Color: 0
+      Amount: 10
+    - IsEmpty: 0
+      Color: 3
+      Amount: 10
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+  - Baskets:
+    - IsEmpty: 0
+      Color: 1
+      Amount: 10
+    - IsEmpty: 0
+      Color: 4
+      Amount: 10
+    - IsEmpty: 0
+      Color: 2
+      Amount: 10
+    - IsEmpty: 0
+      Color: 0
+      Amount: 10
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+  - Baskets:
+    - IsEmpty: 0
+      Color: 3
+      Amount: 10
+    - IsEmpty: 0
+      Color: 1
+      Amount: 10
+    - IsEmpty: 0
+      Color: 4
+      Amount: 10
+    - IsEmpty: 0
+      Color: 2
+      Amount: 10
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+  - Baskets:
+    - IsEmpty: 0
+      Color: 0
+      Amount: 10
+    - IsEmpty: 0
+      Color: 3
+      Amount: 10
+    - IsEmpty: 0
+      Color: 1
+      Amount: 10
+    - IsEmpty: 0
+      Color: 4
+      Amount: 10
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+  - Baskets:
+    - IsEmpty: 0
+      Color: 2
+      Amount: 10
+    - IsEmpty: 0
+      Color: 0
+      Amount: 10
+    - IsEmpty: 0
+      Color: 3
+      Amount: 10
+    - IsEmpty: 0
+      Color: 1
+      Amount: 10
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+  - Baskets:
+    - IsEmpty: 0
+      Color: 4
+      Amount: 10
+    - IsEmpty: 0
+      Color: 2
+      Amount: 10
+    - IsEmpty: 0
+      Color: 0
+      Amount: 10
+    - IsEmpty: 0
+      Color: 3
+      Amount: 10
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+  - Baskets:
+    - IsEmpty: 0
+      Color: 1
+      Amount: 10
+    - IsEmpty: 0
+      Color: 4
+      Amount: 10
+    - IsEmpty: 0
+      Color: 2
+      Amount: 10
+    - IsEmpty: 0
+      Color: 0
+      Amount: 10
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+  SlotCount: 5

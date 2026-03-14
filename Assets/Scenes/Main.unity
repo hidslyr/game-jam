@@ -2777,8 +2777,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 56b81db25b978424398a1112040f5582, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BasketGrid
-  BasketSpacingX: 2
-  BasketSpacingZ: 2
+  BasketSpacingX: 1.5
+  BasketSpacingZ: 1.5
   GravityAnimDuration: 0.3
   BasketPrefab: {fileID: 5289327272368865705, guid: 97b00ac507fe7476bbea1e08412f26f4, type: 3}
 --- !u!1 &1587120610

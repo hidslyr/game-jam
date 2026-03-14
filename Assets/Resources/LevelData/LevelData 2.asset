@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba10e213642414bd19235df544b9ad6c, type: 3}
   m_Name: LevelData 2
   m_EditorClassIdentifier: Assembly-CSharp::LevelData
-  LevelNumber: 3
-  LevelName: Level 3
+  LevelNumber: 2
+  LevelName: Level 2
   TimeLimitSeconds: 120
