@@ -33,10 +33,12 @@ public struct PieceEntry
 
 /// <summary>
 /// A single basket: color + amount it holds.
+/// If IsEmpty = true, this is an empty grid slot (no basket spawned).
 /// </summary>
 [System.Serializable]
 public struct BasketEntry
 {
+    public bool IsEmpty;
     public GameColor Color;
     public int Amount;
 }

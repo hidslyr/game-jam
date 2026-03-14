@@ -48,6 +48,10 @@ public class BasketGrid : MonoBehaviour
                 if (c >= gridRows[r].Baskets.Length) continue;
 
                 var entry = gridRows[r].Baskets[c];
+
+                // Skip empty slots — they preserve column position but spawn no basket
+                if (entry.IsEmpty) continue;
+
                 var pos = GetWorldPosition(c, col.Count);
                 var basket = Instantiate(BasketPrefab, transform);
                 basket.transform.localPosition = pos;

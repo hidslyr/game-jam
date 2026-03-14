@@ -15,26 +15,52 @@ MonoBehaviour:
   LevelNumber: 1
   LevelName: Level 1
   PuzzlePieces:
-  - Color: 1
-    Amount: 6
   - Color: 0
-    Amount: 6
+    Amount: 3
+  - Color: 1
+    Amount: 2
   - Color: 2
-    Amount: 6
+    Amount: 1
+  - Color: 0
+    Amount: 1
   GridRows:
   - Baskets:
-    - Color: 1
+    - IsEmpty: 0
+      Color: 0
       Amount: 2
-    - Color: 1
-      Amount: 2
-    - Color: 1
-      Amount: 2
+    - IsEmpty: 0
+      Color: 0
+      Amount: 1
+    - IsEmpty: 0
+      Color: 2
+      Amount: 1
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
   - Baskets:
-    - Color: 0
-      Amount: 4
-    - Color: 0
-      Amount: 2
+    - IsEmpty: 0
+      Color: 1
+      Amount: 1
+    - IsEmpty: 0
+      Color: 1
+      Amount: 1
+    - IsEmpty: 0
+      Color: 0
+      Amount: 1
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
   - Baskets:
-    - Color: 2
-      Amount: 6
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+    - IsEmpty: 0
+      Color: 0
+      Amount: 1
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
+    - IsEmpty: 1
+      Color: 0
+      Amount: 0
   SlotCount: 5
