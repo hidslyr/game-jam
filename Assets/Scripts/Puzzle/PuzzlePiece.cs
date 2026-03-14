@@ -123,7 +123,7 @@ public class PuzzlePiece : MonoBehaviour
     public void SetActive(bool active)
     {
         if (IsCleared) return;
-        transform.localScale = active ? Vector3.one * 1.1f : Vector3.one;
+        // No visual change — kept for future use
     }
 
     void SwapMaterial(GameColor color)

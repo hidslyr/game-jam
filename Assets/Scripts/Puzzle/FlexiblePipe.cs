@@ -1,91 +1,121 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Smooth flexible pipe connecting SourcePoint to current active piece.
-/// Uses a Bézier curve with slight sag — no physics, no jitter.
-/// Supports pump animation (width bulge traveling source→target).
+/// Two-part pipe system:
+///   Part 1 (active pipe): source → through all cleared pieces (extends as pieces clear)
+///   Part 2 (skeleton):    frame connecting all pieces in order (always visible)
+/// Pump animation travels through the full active pipe on fill.
 /// </summary>
 public class FlexiblePipe : MonoBehaviour
 {
     [Header("Pipe Settings")]
     public Transform SourcePoint;
 
-    [Header("Curve")]
-    public int Resolution = 20;
-    public float SagAmount = 0.5f;
-    public float SmoothSpeed = 8f;
+    [Header("Active Pipe (Part 1)")]
+    public int ActiveResolution = 16;
+    public float ActiveSagAmount = 0.3f;
+    public float ActiveSwayAmount = 0.05f;
 
-    [Header("Line Renderer")]
+    [Header("Skeleton Frame (Part 2)")]
+    public int SkeletonResolution = 8;
+    public float SkeletonSagAmount = 0f;
+    public float SkeletonSwayAmount = 0.01f;
+
+    [Header("Shared")]
+    public float SwaySpeed = 1.5f;
     public float PipeWidth = 0.08f;
     public Material PipeMaterial;
     public Color PipeColor = Color.gray;
 
-    [Header("Wind Sway")]
-    public float SwayAmount = 0.05f;
-    public float SwaySpeed = 1.5f;
-
     [Header("Pump Animation")]
     public float PumpDuration = 0.6f;
     public float PumpBulgeMultiplier = 3f;
-    public float PumpBulgeWidth = 0.15f; // How wide the bulge is (0-1 along curve)
+    public float PumpBulgeWidth = 0.15f;
 
-    LineRenderer lineRenderer;
-    Vector3 smoothedTarget;
-    bool initialized;
-    GameColor currentPipeColor = (GameColor)(-1);
+    // Part 1: active pipe (extends through cleared pieces)
+    LineRenderer activePipe;
+    // Part 2: skeleton segments (one LineRenderer per piece-to-piece)
+    List<LineRenderer> skeletonSegments = new List<LineRenderer>();
+
+    // Cached piece ConnectPoint positions (set once on init)
+    List<Vector3> piecePositions = new List<Vector3>();
+    int clearedCount = 0;
 
     // Pump state
     bool isPumping;
-    float pumpProgress; // 0→1 as bulge travels source→target
-
+    float pumpProgress;
     public bool IsPumping => isPumping;
 
     void Awake()
     {
-        SetupLineRenderer();
+        activePipe = CreateLineRenderer("ActivePipe");
     }
 
     void Start()
     {
-        var piece = PuzzleBoard.Instance?.GetCurrentPiece();
-        if (piece != null)
+        BuildPipeSystem();
+    }
+
+    /// <summary>
+    /// Initialize both pipe parts from PuzzleBoard pieces.
+    /// </summary>
+    void BuildPipeSystem()
+    {
+        var pieces = PuzzleBoard.Instance?.GetAllPieces();
+        if (pieces == null || pieces.Count == 0 || SourcePoint == null) return;
+
+        // Cache all piece ConnectPoint positions
+        piecePositions.Clear();
+        piecePositions.Add(SourcePoint.position); // Index 0 = source
+
+        for (int i = 0; i < pieces.Count; i++)
         {
-            var cp = piece.transform.Find("ConnectPoint");
-            smoothedTarget = cp != null ? cp.position : piece.transform.position;
+            var cp = pieces[i].transform.Find("ConnectPoint");
+            piecePositions.Add(cp != null ? cp.position : pieces[i].transform.position);
         }
-        else if (SourcePoint != null)
-            smoothedTarget = SourcePoint.position;
+
+        // Create skeleton segments (piece[i] → piece[i+1])
+        for (int i = 1; i < piecePositions.Count - 1; i++)
+        {
+            var lr = CreateLineRenderer($"Skeleton_{i}");
+            skeletonSegments.Add(lr);
+        }
+
+        clearedCount = 0;
     }
 
     void LateUpdate()
     {
-        if (SourcePoint == null || lineRenderer == null) return;
+        if (piecePositions.Count < 2) return;
 
-        var piece = PuzzleBoard.Instance?.GetCurrentPiece();
-        if (piece == null) return;
+        float time = Time.time * SwaySpeed;
 
-        var connectPoint = piece.transform.Find("ConnectPoint");
-        Vector3 targetPos = connectPoint != null ? connectPoint.position : piece.transform.position;
+        // ── Part 1: Active pipe (always source → first piece only) ──
+        UpdateMultiSegmentPipe(activePipe, 0, 1, time, true, 0);
 
-        UpdatePipeMaterial(piece.Color);
-
-        if (!initialized)
+        // ── Part 2: Skeleton (all piece-to-piece segments, always visible) ──
+        for (int i = 0; i < skeletonSegments.Count; i++)
         {
-            smoothedTarget = targetPos;
-            initialized = true;
-        }
-        else
-        {
-            smoothedTarget = Vector3.Lerp(smoothedTarget, targetPos, Time.deltaTime * SmoothSpeed);
-        }
+            int segStartPieceIdx = i + 1;
+            bool pumpThrough = isPumping && segStartPieceIdx <= clearedCount;
 
-        UpdateCurve(SourcePoint.position, smoothedTarget);
+            UpdateSingleSegment(skeletonSegments[i], piecePositions[segStartPieceIdx],
+                piecePositions[segStartPieceIdx + 1], time, i, pumpThrough, segStartPieceIdx);
+        }
     }
 
     /// <summary>
-    /// Play the pump animation (bulge traveling source→target).
-    /// Returns a Coroutine so callers can yield on it.
+    /// Notify that a piece has been cleared — extends active pipe.
+    /// </summary>
+    public void OnPieceCleared()
+    {
+        clearedCount++;
+    }
+
+    /// <summary>
+    /// Play pump animation through the full active pipe.
     /// </summary>
     public Coroutine PlayPump()
     {
@@ -109,93 +139,165 @@ public class FlexiblePipe : MonoBehaviour
         isPumping = false;
     }
 
-    void UpdateCurve(Vector3 start, Vector3 end)
+    // ────── Rendering ──────
+
+    /// <summary>
+    /// Render a multi-segment Bézier pipe through waypoints[startIdx..endIdx].
+    /// segmentOffset: which segment index this represents in the full pump path
+    /// </summary>
+    void UpdateMultiSegmentPipe(LineRenderer lr, int startIdx, int endIdx, float time, bool withPump, int segmentOffset)
     {
-        lineRenderer.positionCount = Resolution;
-
-        Vector3 mid = (start + end) * 0.5f;
-        mid.y -= SagAmount;
-
-        float time = Time.time * SwaySpeed;
-
-        // Build width curve with pump bulge
-        var widthCurve = new AnimationCurve();
-
-        for (int i = 0; i < Resolution; i++)
+        int segCount = endIdx - startIdx;
+        if (segCount <= 0)
         {
-            float t = i / (float)(Resolution - 1);
-
-            // Position — Bézier
-            Vector3 point = (1 - t) * (1 - t) * start
-                          + 2 * (1 - t) * t * mid
-                          + t * t * end;
-
-            // Wind sway
-            float swayStrength = Mathf.Sin(t * Mathf.PI) * SwayAmount;
-            float noiseX = Mathf.PerlinNoise(time + i * 0.3f, 0f) - 0.5f;
-            float noiseZ = Mathf.PerlinNoise(0f, time + i * 0.3f) - 0.5f;
-            point.x += noiseX * swayStrength;
-            point.z += noiseZ * swayStrength;
-
-            lineRenderer.SetPosition(i, point);
-
-            // Width — base + pump bulge
-            float width = PipeWidth;
-            if (isPumping)
-            {
-                // Gaussian bulge centered at pumpProgress
-                float dist = Mathf.Abs(t - pumpProgress);
-                float bulge = Mathf.Exp(-(dist * dist) / (2f * PumpBulgeWidth * PumpBulgeWidth));
-                width += PipeWidth * (PumpBulgeMultiplier - 1f) * bulge;
-            }
-
-            widthCurve.AddKey(t, width);
+            lr.positionCount = 0;
+            return;
         }
 
-        lineRenderer.widthCurve = widthCurve;
+        int totalPoints = segCount * ActiveResolution;
+        lr.positionCount = totalPoints;
+
+        var widthCurve = new AnimationCurve();
+        // Total segments in pump path: active(1) + cleared skeleton segments
+        int totalPumpSegments = 1 + clearedCount;
+
+        int pointIdx = 0;
+        for (int seg = 0; seg < segCount; seg++)
+        {
+            Vector3 segStart = piecePositions[startIdx + seg];
+            Vector3 segEnd = piecePositions[startIdx + seg + 1];
+            Vector3 mid = (segStart + segEnd) * 0.5f;
+            mid.y -= ActiveSagAmount;
+
+            for (int i = 0; i < ActiveResolution; i++)
+            {
+                float localT = i / (float)(ActiveResolution - 1);
+
+                Vector3 point = (1 - localT) * (1 - localT) * segStart
+                              + 2 * (1 - localT) * localT * mid
+                              + localT * localT * segEnd;
+
+                float globalT = (float)pointIdx / (totalPoints - 1);
+                float swayStrength = Mathf.Sin(globalT * Mathf.PI) * ActiveSwayAmount;
+                float noiseX = Mathf.PerlinNoise(time + pointIdx * 0.3f, 0f) - 0.5f;
+                float noiseZ = Mathf.PerlinNoise(0f, time + pointIdx * 0.3f) - 0.5f;
+                point.x += noiseX * swayStrength;
+                point.z += noiseZ * swayStrength;
+
+                lr.SetPosition(pointIdx, point);
+
+                float width = PipeWidth;
+                if (withPump && isPumping && totalPumpSegments > 0)
+                {
+                    // Map local progress to global pump path
+                    float pumpT = ((segmentOffset + seg) + localT) / totalPumpSegments;
+                    float dist = Mathf.Abs(pumpT - pumpProgress);
+                    float bulge = Mathf.Exp(-(dist * dist) / (2f * PumpBulgeWidth * PumpBulgeWidth));
+                    width += PipeWidth * (PumpBulgeMultiplier - 1f) * bulge;
+                }
+                widthCurve.AddKey(globalT, width);
+
+                pointIdx++;
+            }
+        }
+
+        lr.widthCurve = widthCurve;
     }
 
-    void SetupLineRenderer()
+    /// <summary>
+    /// Render a straight segment (skeleton frame). Supports pump bulge pass-through.
+    /// </summary>
+    void UpdateSingleSegment(LineRenderer lr, Vector3 start, Vector3 end, float time, int segIndex,
+        bool pumpThrough, int pumpSegIndex)
     {
-        lineRenderer = GetComponent<LineRenderer>();
-        if (lineRenderer == null)
-            lineRenderer = gameObject.AddComponent<LineRenderer>();
+        if (SkeletonSagAmount > 0f || SkeletonSwayAmount > 0f)
+        {
+            lr.positionCount = SkeletonResolution;
+            Vector3 mid = (start + end) * 0.5f;
+            mid.y -= SkeletonSagAmount;
 
-        lineRenderer.positionCount = Resolution;
-        lineRenderer.startWidth = PipeWidth;
-        lineRenderer.endWidth = PipeWidth;
-        lineRenderer.startColor = PipeColor;
-        lineRenderer.endColor = PipeColor;
-        lineRenderer.numCornerVertices = 4;
-        lineRenderer.numCapVertices = 4;
-        lineRenderer.useWorldSpace = true;
+            int totalPumpSegments = 1 + clearedCount;
+            var widthCurve = new AnimationCurve();
+
+            for (int i = 0; i < SkeletonResolution; i++)
+            {
+                float t = i / (float)(SkeletonResolution - 1);
+                Vector3 point = Vector3.Lerp(start, end, t);
+                point.y += (1 - t) * t * 4f * (mid.y - (start.y + (end.y - start.y) * t));
+
+                if (SkeletonSwayAmount > 0f)
+                {
+                    float swayStrength = Mathf.Sin(t * Mathf.PI) * SkeletonSwayAmount;
+                    point.x += (Mathf.PerlinNoise(time + (segIndex * SkeletonResolution + i) * 0.3f, 0.5f) - 0.5f) * swayStrength;
+                    point.z += (Mathf.PerlinNoise(0.5f, time + (segIndex * SkeletonResolution + i) * 0.3f) - 0.5f) * swayStrength;
+                }
+
+                lr.SetPosition(i, point);
+
+                float width = PipeWidth;
+                if (pumpThrough && isPumping && totalPumpSegments > 0)
+                {
+                    float pumpT = (pumpSegIndex + t) / totalPumpSegments;
+                    float dist = Mathf.Abs(pumpT - pumpProgress);
+                    float bulge = Mathf.Exp(-(dist * dist) / (2f * PumpBulgeWidth * PumpBulgeWidth));
+                    width += PipeWidth * (PumpBulgeMultiplier - 1f) * bulge;
+                }
+                widthCurve.AddKey(t, width);
+            }
+            lr.widthCurve = widthCurve;
+        }
+        else
+        {
+            // Pure straight line
+            lr.positionCount = 2;
+            lr.SetPosition(0, start);
+            lr.SetPosition(1, end);
+
+            if (pumpThrough && isPumping)
+            {
+                int totalPumpSegments = 1 + clearedCount;
+                var widthCurve = new AnimationCurve();
+                for (int i = 0; i < 2; i++)
+                {
+                    float t = (float)i;
+                    float pumpT = (pumpSegIndex + t) / totalPumpSegments;
+                    float dist = Mathf.Abs(pumpT - pumpProgress);
+                    float bulge = Mathf.Exp(-(dist * dist) / (2f * PumpBulgeWidth * PumpBulgeWidth));
+                    float width = PipeWidth + PipeWidth * (PumpBulgeMultiplier - 1f) * bulge;
+                    widthCurve.AddKey(t, width);
+                }
+                lr.widthCurve = widthCurve;
+            }
+            else
+            {
+                lr.startWidth = PipeWidth;
+                lr.endWidth = PipeWidth;
+            }
+        }
+    }
+
+    // ────── Setup ──────
+
+    LineRenderer CreateLineRenderer(string name)
+    {
+        var go = new GameObject(name);
+        go.transform.SetParent(transform);
+
+        var lr = go.AddComponent<LineRenderer>();
+        lr.positionCount = 0;
+        lr.startWidth = PipeWidth;
+        lr.endWidth = PipeWidth;
+        lr.startColor = PipeColor;
+        lr.endColor = PipeColor;
+        lr.numCornerVertices = 4;
+        lr.numCapVertices = 4;
+        lr.useWorldSpace = true;
 
         if (PipeMaterial != null)
-            lineRenderer.material = PipeMaterial;
+            lr.material = PipeMaterial;
         else
-            lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
-    }
+            lr.material = new Material(Shader.Find("Sprites/Default"));
 
-    void UpdatePipeMaterial(GameColor color)
-    {
-        if (lineRenderer == null) return;
-        if (color == currentPipeColor) return;
-
-        currentPipeColor = color;
-
-        string matName;
-        switch (color)
-        {
-            case GameColor.Red:    matName = "mat_box_red"; break;
-            case GameColor.Green:  matName = "mat_box_green"; break;
-            case GameColor.Blue:   matName = "mat_box_blue"; break;
-            case GameColor.Yellow: matName = "mat_box_yellow"; break;
-            case GameColor.Purple: matName = "mat_box_purple"; break;
-            default:               matName = "mat_box_base"; break;
-        }
-
-        var mat = Resources.Load<Material>($"GameJam/Art/Box/{matName}");
-        if (mat != null)
-            lineRenderer.material = mat;
+        return lr;
     }
 }
