@@ -145,11 +145,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 6b69d9a55e5c820429bffc2c9f4b5a2f, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.09
+      value: -0.211
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 6b69d9a55e5c820429bffc2c9f4b5a2f, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.63
+      value: -0.098
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 6b69d9a55e5c820429bffc2c9f4b5a2f, type: 3}
       propertyPath: m_LocalRotation.w
@@ -1996,7 +1996,7 @@ Transform:
   m_GameObject: {fileID: 915651209}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.025, y: -0.06, z: 3.605}
+  m_LocalPosition: {x: -0.025, y: -0.06, z: 2.91}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3754,7 +3754,7 @@ MonoBehaviour:
   SkeletonSagAmount: 0
   SkeletonSwayAmount: 0
   SwaySpeed: 1.5
-  PipeWidth: 0.05
+  PipeWidth: 0.15
   PipeMaterial: {fileID: 2100000, guid: 2c8affae331d41e4791fa8ffcf295667, type: 2}
   PipeColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   PumpDuration: 0.6

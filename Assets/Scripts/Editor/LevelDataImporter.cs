@@ -150,28 +150,18 @@ public class LevelDataImporter : Editor
         {
             var trimmed = cell.Trim();
 
-            if (string.IsNullOrEmpty(trimmed))
+            // Skip empty cells — only take non-empty values
+            if (string.IsNullOrEmpty(trimmed)) continue;
+
+            var parsed = ParseColorAmount(trimmed);
+            if (parsed.HasValue)
             {
-                // Empty cell = empty grid slot
-                baskets.Add(new BasketEntry { IsEmpty = true });
-            }
-            else
-            {
-                var parsed = ParseColorAmount(trimmed);
-                if (parsed.HasValue)
+                baskets.Add(new BasketEntry
                 {
-                    baskets.Add(new BasketEntry
-                    {
-                        IsEmpty = false,
-                        Color = parsed.Value.color,
-                        Amount = parsed.Value.amount
-                    });
-                }
-                else
-                {
-                    // Unparseable = treat as empty
-                    baskets.Add(new BasketEntry { IsEmpty = true });
-                }
+                    IsEmpty = false,
+                    Color = parsed.Value.color,
+                    Amount = parsed.Value.amount
+                });
             }
         }
 

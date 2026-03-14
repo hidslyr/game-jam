@@ -49,24 +49,6 @@ MonoBehaviour:
     - IsEmpty: 0
       Color: 3
       Amount: 10
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
   - Baskets:
     - IsEmpty: 0
       Color: 0
@@ -80,24 +62,6 @@ MonoBehaviour:
     - IsEmpty: 0
       Color: 0
       Amount: 10
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
   - Baskets:
     - IsEmpty: 0
       Color: 2
@@ -111,24 +75,6 @@ MonoBehaviour:
     - IsEmpty: 0
       Color: 2
       Amount: 10
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
   - Baskets:
     - IsEmpty: 0
       Color: 1
@@ -142,24 +88,6 @@ MonoBehaviour:
     - IsEmpty: 0
       Color: 0
       Amount: 10
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
   - Baskets:
     - IsEmpty: 0
       Color: 2
@@ -173,24 +101,6 @@ MonoBehaviour:
     - IsEmpty: 0
       Color: 1
       Amount: 10
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
   - Baskets:
     - IsEmpty: 0
       Color: 1
@@ -204,24 +114,6 @@ MonoBehaviour:
     - IsEmpty: 0
       Color: 4
       Amount: 10
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
   - Baskets:
     - IsEmpty: 0
       Color: 3
@@ -235,24 +127,6 @@ MonoBehaviour:
     - IsEmpty: 0
       Color: 3
       Amount: 10
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
   - Baskets:
     - IsEmpty: 0
       Color: 4
@@ -260,28 +134,4 @@ MonoBehaviour:
     - IsEmpty: 0
       Color: 4
       Amount: 10
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
-    - IsEmpty: 1
-      Color: 0
-      Amount: 0
   SlotCount: 5
