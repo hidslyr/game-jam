@@ -38,19 +38,32 @@ public class Basket : MonoBehaviour
         UpdateDisplay();
     }
 
+    static bool pickedThisFrame;
+
+    void LateUpdate() => pickedThisFrame = false;
+
     void Update()
     {
         if (!IsPickable) return;
+        if (pickedThisFrame) return;
         if (Mouse.current == null) return;
         if (!Mouse.current.leftButton.wasPressedThisFrame) return;
 
-        // Raycast from mouse position (3D)
+        // Raycast from mouse position (3D, BoxCollider)
         var mousePos = Mouse.current.position.ReadValue();
         var ray = Camera.main.ScreenPointToRay(mousePos);
 
-        if (Physics.Raycast(ray, out RaycastHit hit) && hit.collider.gameObject == gameObject)
+        // RaycastAll to handle overlapping colliders
+        var hits = Physics.RaycastAll(ray);
+        foreach (var hit in hits)
         {
-            PuzzleBoard.Instance?.OnBasketPicked(this);
+            // Check if hit collider is on this GO or any child
+            if (hit.collider.transform == transform || hit.collider.transform.IsChildOf(transform))
+            {
+                pickedThisFrame = true;
+                PuzzleBoard.Instance?.OnBasketPicked(this);
+                break;
+            }
         }
     }
 
