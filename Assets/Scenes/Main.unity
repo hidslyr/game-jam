@@ -3796,7 +3796,7 @@ MonoBehaviour:
   SkeletonSwayAmount: 0.01
   SwaySpeed: 1.5
   PipeWidth: 0.15
-  PipeMaterial: {fileID: 0}
+  PipeMaterial: {fileID: 2100000, guid: 7303eb7866ef24a1f9276cef9d5c1511, type: 2}
   PipeColor: {r: 1, g: 1, b: 1, a: 1}
   PumpDuration: 0.4
   PumpBulgeMultiplier: 1.36
