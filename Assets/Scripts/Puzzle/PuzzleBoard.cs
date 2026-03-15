@@ -114,6 +114,11 @@ public class PuzzleBoard : MonoBehaviour
     public void OnBasketPicked(Basket basket)
     {
         if (stagingSlots == null) return;
+
+        // Hide onboarding on level 1 first pick
+        if (Global.Instance != null && Global.Instance.CurrentLevel == 1)
+            MainUI.Instance?.HideOnboarding();
+
         StartCoroutine(HandleBasketPicked(basket));
     }
 

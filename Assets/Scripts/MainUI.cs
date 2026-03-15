@@ -210,4 +210,11 @@ public class MainUI : MonoBehaviour
         }
         return null;
     }
+
+    public void HideOnboarding()
+    {
+        var onboarding = transform.Find("Onboarding");
+        if (onboarding != null)
+            onboarding.gameObject.SetActive(false);
+    }
 }
