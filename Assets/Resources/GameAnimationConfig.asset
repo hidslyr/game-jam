@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72dcd7175c6c641feb48c0e1b52d9158, type: 3}
   m_Name: GameAnimationConfig
   m_EditorClassIdentifier: Assembly-CSharp::GameAnimationConfig
-  PumpCount: 2
+  PumpCount: 3
   PumpRepeatDelay: 0
   FillDuration: 0.5
   FillSpeedMultiplier: 2
