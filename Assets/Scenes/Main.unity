@@ -3795,9 +3795,9 @@ MonoBehaviour:
   SkeletonSagAmount: 0.1
   SkeletonSwayAmount: 0.01
   SwaySpeed: 1.5
-  PipeWidth: 0.15
-  PipeMaterial: {fileID: 2100000, guid: 7303eb7866ef24a1f9276cef9d5c1511, type: 2}
-  PipeColor: {r: 1, g: 1, b: 1, a: 1}
+  PipeWidth: 0.1
+  PipeMaterial: {fileID: 0}
+  PipeColor: {r: 1, g: 1, b: 1, a: 0.8}
   PumpDuration: 0.4
   PumpBulgeMultiplier: 1.36
   PumpBulgeWidth: 0.15
@@ -4168,7 +4168,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: New Text
+  m_text: Balloon Blast Demo
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: fc32e3f522c5b4464bbbde5a55449bd3, type: 2}
   m_sharedMaterial: {fileID: -1949339736484204015, guid: fc32e3f522c5b4464bbbde5a55449bd3, type: 2}
