@@ -13,10 +13,11 @@ Material:
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
   - _ALPHAPREMULTIPLY_ON
+  - _EMISSION
   - _SPECULAR_SETUP
   - _SURFACE_TYPE_TRANSPARENT
   m_InvalidKeywords: []
-  m_LightmapFlags: 4
+  m_LightmapFlags: 2
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: 3000
@@ -127,9 +128,9 @@ Material:
     - _XRMotionVectorsPass: 1
     - _ZWrite: 0
     m_Colors:
-    - _BaseColor: {r: 0.92609704, g: 0.9339623, b: 0.118948035, a: 0.9411765}
+    - _BaseColor: {r: 0.85882354, g: 0.775666, b: 0.05882351, a: 0.9607843}
     - _Color: {r: 0.8207547, g: 0.24390346, b: 0.24390346, a: 1}
-    - _EmissionColor: {r: 0.6392157, g: 0.21285884, b: 0.21285884, a: 1}
+    - _EmissionColor: {r: 0.5568628, g: 0.13859138, b: 0.011764699, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
