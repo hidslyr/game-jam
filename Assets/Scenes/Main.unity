@@ -1260,13 +1260,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 440034074}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.3768911, y: -0, z: -0, w: 0.92625755}
+  m_LocalRotation: {x: 0.38268343, y: 0, z: 0, w: 0.92387956}
   m_LocalPosition: {x: 0, y: 12.63, z: -16.99}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 44.282, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 45, y: 0, z: 0}
 --- !u!114 &440034078
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2148,7 +2148,7 @@ Transform:
   m_GameObject: {fileID: 1101284502}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.06, y: 2.64, z: -0.76}
+  m_LocalPosition: {x: 0, y: 2.64, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3051,7 +3051,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BasketGrid
   BasketSpacingX: 1.5
-  BasketSpacingZ: 1.5
+  BasketSpacingZ: 1.8
   GravityAnimDuration: 0.3
   BasketPrefab: {fileID: 5289327272368865705, guid: 97b00ac507fe7476bbea1e08412f26f4, type: 3}
 --- !u!1001 &1534094125

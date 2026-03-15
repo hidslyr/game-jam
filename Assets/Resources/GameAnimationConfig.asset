@@ -14,3 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GameAnimationConfig
   PumpCount: 2
   PumpRepeatDelay: 0
+  FillDuration: 0.5
+  FillSpeedMultiplier: 2
+  PieceFillAlphaEnd: 225
