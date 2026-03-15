@@ -254,10 +254,16 @@ public class PuzzleBoard : MonoBehaviour
             if (basketAnimator != null)
                 basketAnimator.SetTrigger("pump");
 
-            // Start pipe pump (non-blocking — we tick gradual fill alongside it)
+            // Start pipe pump with basket color sphere
             Coroutine pumpCo = null;
             if (flexiblePipe != null)
-                pumpCo = flexiblePipe.PlayPump();
+            {
+                Material sphereMat = null;
+                var basketRenderers = basketComp?.GetComponentsInChildren<MeshRenderer>();
+                if (basketRenderers != null && basketRenderers.Length > 0)
+                    sphereMat = basketRenderers[0].material;
+                pumpCo = flexiblePipe.PlayPump(sphereMat);
+            }
 
             // SFX per pump iteration
             GameManager.Instance?.PlayPieceFillSFX();

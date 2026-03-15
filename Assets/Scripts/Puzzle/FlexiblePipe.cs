@@ -33,6 +33,7 @@ public class FlexiblePipe : MonoBehaviour
     public float PumpDuration = 0.6f;
     public float PumpBulgeMultiplier = 3f;
     public float PumpBulgeWidth = 0.15f;
+    public float PumpSphereSize = 0.12f;
 
     // Part 1: active pipe (extends through cleared pieces)
     LineRenderer activePipe;
@@ -114,19 +115,34 @@ public class FlexiblePipe : MonoBehaviour
     /// <summary>
     /// Play pump animation through the full active pipe.
     /// </summary>
-    public Coroutine PlayPump()
+    public Coroutine PlayPump(Material sphereMat = null)
     {
-        return StartCoroutine(PumpCoroutine());
+        return StartCoroutine(PumpCoroutine(sphereMat));
     }
 
     // Wrapper so each pump has a stable reference
     class PumpEntry { public float progress; }
 
-    IEnumerator PumpCoroutine()
+    IEnumerator PumpCoroutine(Material sphereMat)
     {
         var entry = new PumpEntry { progress = 0f };
         activePumps.Add(0f);
         int entryIndex = activePumps.Count - 1;
+
+        // Create pump sphere
+        GameObject sphere = null;
+        if (PumpSphereSize > 0f)
+        {
+            sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            sphere.transform.localScale = Vector3.one * PumpSphereSize;
+            sphere.name = "PumpSphere";
+            // Remove collider
+            var col = sphere.GetComponent<Collider>();
+            if (col != null) Destroy(col);
+            // Set material
+            if (sphereMat != null)
+                sphere.GetComponent<Renderer>().material = sphereMat;
+        }
 
         float elapsed = 0f;
         while (elapsed < PumpDuration)
@@ -134,19 +150,46 @@ public class FlexiblePipe : MonoBehaviour
             elapsed += Time.deltaTime;
             float p = Mathf.Clamp01(elapsed / PumpDuration);
 
-            // Update our entry — find it by checking we're still in range
             if (entryIndex < activePumps.Count)
                 activePumps[entryIndex] = p;
+
+            // Position sphere along pipe
+            if (sphere != null)
+                sphere.transform.position = EvaluatePumpPosition(p);
 
             yield return null;
         }
 
-        // Remove by setting to a sentinel, then clean up
+        // Cleanup
+        if (sphere != null) Destroy(sphere);
+
         if (entryIndex < activePumps.Count)
             activePumps[entryIndex] = -1f;
 
-        // Remove all completed pumps (sentinel = -1)
         activePumps.RemoveAll(v => v < 0f || v >= 1f);
+    }
+
+    /// <summary>
+    /// Get world position on the active pipe path at pump progress t (0..1).
+    /// </summary>
+    Vector3 EvaluatePumpPosition(float t)
+    {
+        // Pump travels through segments 0..clearedCount
+        int totalSegs = 1 + clearedCount;
+        float scaledT = t * totalSegs;
+        int segIdx = Mathf.Min((int)scaledT, totalSegs - 1);
+        float localT = scaledT - segIdx;
+
+        int posIdx = segIdx; // piecePositions index
+        if (posIdx + 1 >= piecePositions.Count) return piecePositions[piecePositions.Count - 1];
+
+        // Use Catmull-Rom for smooth position
+        Vector3 p1 = piecePositions[posIdx];
+        Vector3 p2 = piecePositions[posIdx + 1];
+        Vector3 p0 = posIdx - 1 >= 0 ? piecePositions[posIdx - 1] : p1 + (p1 - p2);
+        Vector3 p3 = posIdx + 2 < piecePositions.Count ? piecePositions[posIdx + 2] : p2 + (p2 - p1);
+
+        return CatmullRom(p0, p1, p2, p3, localT);
     }
 
     // ────── Rendering ──────
