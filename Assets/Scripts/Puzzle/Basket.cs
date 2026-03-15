@@ -106,4 +106,27 @@ public class Basket : MonoBehaviour
             Debug.LogWarning($"[Basket] Material not found: GameJam/Art/Box/{matName}");
         }
     }
+
+    public void SetOutline(bool visible)
+    {
+        if (meshRenderer != null && meshRenderer.Length > 1)
+            meshRenderer[1].enabled = visible;
+    }
+
+    static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
+
+    public void SetDarken(bool darken)
+    {
+        if (meshRenderer == null) return;
+        var propBlock = new MaterialPropertyBlock();
+        foreach (var mr in meshRenderer)
+        {
+            mr.GetPropertyBlock(propBlock);
+            var baseColor = mr.sharedMaterial.GetColor(BaseColorId);
+            if (darken)
+                baseColor *= 0.6f;
+            propBlock.SetColor(BaseColorId, baseColor);
+            mr.SetPropertyBlock(propBlock);
+        }
+    }
 }

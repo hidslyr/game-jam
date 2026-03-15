@@ -113,7 +113,10 @@ public class BasketGrid : MonoBehaviour
         {
             for (int i = 0; i < col.Count; i++)
             {
-                col[i].IsPickable = (i == 0); // Only top basket is pickable
+                bool isTop = (i == 0);
+                col[i].IsPickable = isTop;
+                col[i].SetOutline(isTop);
+                col[i].SetDarken(!isTop);
             }
         }
     }
