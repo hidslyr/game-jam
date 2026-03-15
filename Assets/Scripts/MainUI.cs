@@ -10,7 +10,8 @@ using UnityEngine.UI;
 public class MainUI : MonoBehaviour
 {
     public static MainUI Instance { get; private set; }
-
+    public bool enableDebugUI = true;
+    public GameObject debugButtonsContainer;
     int selectedLevel = 1;
 
     // Cached button references (found by name)
@@ -44,7 +45,11 @@ public class MainUI : MonoBehaviour
             txtSelectedLevel.text = $"Level {currentLevel}";
 
         // Generate debug piece stack
-        GenerateDebugPieceStack();
+        if (enableDebugUI)
+        {
+            debugButtonsContainer.SetActive(true);
+            GenerateDebugPieceStack();
+        }
     }
 
     void GenerateDebugPieceStack()
