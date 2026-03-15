@@ -13,7 +13,7 @@ public class Basket : MonoBehaviour
     public int Amount { get; private set; }
     public bool IsPickable { get; set; }
 
-    Renderer meshRenderer;
+    MeshRenderer[] meshRenderer;
     TextMeshPro tmpText;
 
     public void Initialize(GameColor color, int amount)
@@ -22,7 +22,7 @@ public class Basket : MonoBehaviour
         Amount = amount;
         IsPickable = false;
 
-        meshRenderer = GetComponentInChildren<Renderer>();
+        meshRenderer = GetComponentsInChildren<MeshRenderer>();
         tmpText = GetComponentInChildren<TextMeshPro>();
 
         SwapMaterial(color);
@@ -92,9 +92,14 @@ public class Basket : MonoBehaviour
         if (mat != null)
         {
             // Swap only the first material, leave the rest
-            var mats = meshRenderer.materials;
+            var mats = meshRenderer[0].materials;
             mats[0] = mat;
-            meshRenderer.materials = mats;
+            meshRenderer[0].materials = mats;
+
+            // Also swap for other renderers (e.g. outline)
+            var mats2 = meshRenderer[1].materials;
+            mats2[0] = mat;
+            meshRenderer[1].materials = mats2;
         }
         else
         {
