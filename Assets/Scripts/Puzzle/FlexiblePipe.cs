@@ -44,8 +44,9 @@ public class FlexiblePipe : MonoBehaviour
     List<Vector3> piecePositions = new List<Vector3>();
     int clearedCount = 0;
 
-    // Pump state — multiple simultaneous pumps
-    List<float> activePumps = new List<float>();
+    // Pump state — stores progress + color per pump
+    struct PumpData { public float progress; public Color color; }
+    List<PumpData> activePumps = new List<PumpData>();
     public bool IsPumping => activePumps.Count > 0;
 
     void Awake()
@@ -117,16 +118,19 @@ public class FlexiblePipe : MonoBehaviour
     /// </summary>
     public Coroutine PlayPump(Material sphereMat = null)
     {
-        return StartCoroutine(PumpCoroutine(sphereMat));
+        Color pumpColor = PipeColor;
+        if (sphereMat != null)
+            pumpColor = sphereMat.GetColor(Shader.PropertyToID("_BaseColor"));
+        return StartCoroutine(PumpCoroutine(sphereMat, pumpColor));
     }
 
     // Wrapper so each pump has a stable reference
     class PumpEntry { public float progress; }
 
-    IEnumerator PumpCoroutine(Material sphereMat)
+    IEnumerator PumpCoroutine(Material sphereMat, Color pumpColor)
     {
         var entry = new PumpEntry { progress = 0f };
-        activePumps.Add(0f);
+        activePumps.Add(new PumpData { progress = 0f, color = pumpColor });
         int entryIndex = activePumps.Count - 1;
 
         // Create pump sphere
@@ -136,10 +140,8 @@ public class FlexiblePipe : MonoBehaviour
             sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             sphere.transform.localScale = Vector3.one * PumpSphereSize;
             sphere.name = "PumpSphere";
-            // Remove collider
             var col = sphere.GetComponent<Collider>();
             if (col != null) Destroy(col);
-            // Set material
             if (sphereMat != null)
                 sphere.GetComponent<Renderer>().material = sphereMat;
         }
@@ -151,22 +153,20 @@ public class FlexiblePipe : MonoBehaviour
             float p = Mathf.Clamp01(elapsed / PumpDuration);
 
             if (entryIndex < activePumps.Count)
-                activePumps[entryIndex] = p;
+                activePumps[entryIndex] = new PumpData { progress = p, color = pumpColor };
 
-            // Position sphere along pipe
             if (sphere != null)
                 sphere.transform.position = EvaluatePumpPosition(p);
 
             yield return null;
         }
 
-        // Cleanup
         if (sphere != null) Destroy(sphere);
 
         if (entryIndex < activePumps.Count)
-            activePumps[entryIndex] = -1f;
+            activePumps[entryIndex] = new PumpData { progress = -1f, color = pumpColor };
 
-        activePumps.RemoveAll(v => v < 0f || v >= 1f);
+        activePumps.RemoveAll(v => v.progress < 0f || v.progress >= 1f);
     }
 
     /// <summary>
@@ -211,6 +211,7 @@ public class FlexiblePipe : MonoBehaviour
         lr.positionCount = totalPoints;
 
         var widthCurve = new AnimationCurve();
+        var colorKeys = new List<GradientColorKey>();
         // Total segments in pump path: active(1) + cleared skeleton segments
         int totalPumpSegments = 1 + clearedCount;
 
@@ -240,25 +241,54 @@ public class FlexiblePipe : MonoBehaviour
                 lr.SetPosition(pointIdx, point);
 
                 float width = PipeWidth;
+                Color pointColor = PipeColor;
                 if (withPump && activePumps.Count > 0 && totalPumpSegments > 0)
                 {
                     float pumpT = ((segmentOffset + seg) + localT) / totalPumpSegments;
                     float totalBulge = 0f;
+                    Color bestColor = PipeColor;
+                    float bestBulge = 0f;
                     for (int p = 0; p < activePumps.Count; p++)
                     {
-                        float dist = Mathf.Abs(pumpT - activePumps[p]);
+                        float dist = Mathf.Abs(pumpT - activePumps[p].progress);
                         float bulge = Mathf.Exp(-(dist * dist) / (2f * PumpBulgeWidth * PumpBulgeWidth));
+                        if (bulge > bestBulge)
+                        {
+                            bestBulge = bulge;
+                            bestColor = activePumps[p].color;
+                        }
                         totalBulge = Mathf.Max(totalBulge, bulge);
                     }
                     width += PipeWidth * (PumpBulgeMultiplier - 1f) * totalBulge;
+                    pointColor = Color.Lerp(PipeColor, bestColor, totalBulge);
                 }
                 widthCurve.AddKey(globalT, width);
+                colorKeys.Add(new GradientColorKey(pointColor, globalT));
 
                 pointIdx++;
             }
         }
 
         lr.widthCurve = widthCurve;
+
+        // Build color gradient (max 8 keys for Unity)
+        var gradient = new Gradient();
+        if (colorKeys.Count <= 8)
+        {
+            gradient.colorKeys = colorKeys.ToArray();
+        }
+        else
+        {
+            // Sample 8 evenly spaced keys
+            var sampled = new GradientColorKey[8];
+            for (int k = 0; k < 8; k++)
+            {
+                int idx = Mathf.RoundToInt(k / 7f * (colorKeys.Count - 1));
+                sampled[k] = colorKeys[idx];
+            }
+            gradient.colorKeys = sampled;
+        }
+        lr.colorGradient = gradient;
     }
 
     /// <summary>
@@ -275,6 +305,7 @@ public class FlexiblePipe : MonoBehaviour
 
         skeletonPipe.positionCount = totalPoints;
         var widthCurve = new AnimationCurve();
+        var colorKeys = new List<GradientColorKey>();
         int pointIdx = 0;
 
         for (int seg = 0; seg < segCount; seg++)
@@ -302,30 +333,58 @@ public class FlexiblePipe : MonoBehaviour
 
                 skeletonPipe.SetPosition(pointIdx, point);
 
-                // Width + pump bulge
+                // Width + pump bulge + color
                 float width = PipeWidth;
+                Color pointColor = PipeColor;
                 bool pumpThrough = activePumps.Count > 0 && idx <= clearedCount;
                 if (pumpThrough)
                 {
                     int totalPumpSegments = 1 + clearedCount;
                     float pumpT = (idx + t) / totalPumpSegments;
                     float totalBulge = 0f;
+                    Color bestColor = PipeColor;
+                    float bestBulge = 0f;
                     for (int p = 0; p < activePumps.Count; p++)
                     {
-                        float dist = Mathf.Abs(pumpT - activePumps[p]);
+                        float dist = Mathf.Abs(pumpT - activePumps[p].progress);
                         float bulge = Mathf.Exp(-(dist * dist) / (2f * PumpBulgeWidth * PumpBulgeWidth));
+                        if (bulge > bestBulge)
+                        {
+                            bestBulge = bulge;
+                            bestColor = activePumps[p].color;
+                        }
                         totalBulge = Mathf.Max(totalBulge, bulge);
                     }
                     width += PipeWidth * (PumpBulgeMultiplier - 1f) * totalBulge;
+                    pointColor = Color.Lerp(PipeColor, bestColor, totalBulge);
                 }
 
                 float globalT = (float)pointIdx / (totalPoints - 1);
                 widthCurve.AddKey(globalT, width);
+                colorKeys.Add(new GradientColorKey(pointColor, globalT));
                 pointIdx++;
             }
         }
 
         skeletonPipe.widthCurve = widthCurve;
+
+        // Build color gradient (max 8 keys for Unity)
+        var gradient = new Gradient();
+        if (colorKeys.Count <= 8)
+        {
+            gradient.colorKeys = colorKeys.ToArray();
+        }
+        else
+        {
+            var sampled = new GradientColorKey[8];
+            for (int k = 0; k < 8; k++)
+            {
+                int idx2 = Mathf.RoundToInt(k / 7f * (colorKeys.Count - 1));
+                sampled[k] = colorKeys[idx2];
+            }
+            gradient.colorKeys = sampled;
+        }
+        skeletonPipe.colorGradient = gradient;
     }
 
     /// <summary>

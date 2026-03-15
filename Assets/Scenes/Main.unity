@@ -1236,7 +1236,7 @@ Light:
     m_Type: 2
     m_Resolution: -1
     m_CustomResolution: -1
-    m_Strength: 1
+    m_Strength: 0.555
     m_Bias: 0.05
     m_NormalBias: 0.4
     m_NearPlane: 0.2
@@ -2496,10 +2496,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 18c7fd7efc0224c8d869f179be75e751, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ChainIdleFloat
-  BobAmount: 0.05
-  BobSpeed: 1.2
-  SwayAmount: 0.03
-  SwaySpeed: 0.8
+  BobAmount: 0.06
+  BobSpeed: 2.4
+  SwayAmount: 0.05
+  SwaySpeed: 1.6
 --- !u!1 &1109841869
 GameObject:
   m_ObjectHideFlags: 0
@@ -4217,9 +4217,9 @@ MonoBehaviour:
   PipeMaterial: {fileID: 0}
   PipeColor: {r: 1, g: 1, b: 1, a: 0.8}
   PumpDuration: 0.4
-  PumpBulgeMultiplier: 1.36
-  PumpBulgeWidth: 0.15
-  PumpSphereSize: 0.3
+  PumpBulgeMultiplier: 1.6
+  PumpBulgeWidth: 0.1
+  PumpSphereSize: 0
 --- !u!4 &1957048563
 Transform:
   m_ObjectHideFlags: 0
@@ -4683,7 +4683,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &2134140629
 RectTransform:
   m_ObjectHideFlags: 0
