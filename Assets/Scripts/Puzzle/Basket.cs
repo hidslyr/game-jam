@@ -115,18 +115,10 @@ public class Basket : MonoBehaviour
 
     static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
 
-    public void SetDarken(bool darken)
+    public void SetPickableVisual(bool pickable)
     {
-        if (meshRenderer == null) return;
-        var propBlock = new MaterialPropertyBlock();
-        foreach (var mr in meshRenderer)
-        {
-            mr.GetPropertyBlock(propBlock);
-            var baseColor = mr.sharedMaterial.GetColor(BaseColorId);
-            if (darken)
-                baseColor *= 0.6f;
-            propBlock.SetColor(BaseColorId, baseColor);
-            mr.SetPropertyBlock(propBlock);
-        }
+        var circle = transform.Find("Circle");
+        if (circle != null)
+            circle.gameObject.SetActive(pickable);
     }
 }

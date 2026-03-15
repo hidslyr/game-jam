@@ -116,7 +116,7 @@ public class BasketGrid : MonoBehaviour
                 bool isTop = (i == 0);
                 col[i].IsPickable = isTop;
                 col[i].SetOutline(isTop);
-                col[i].SetDarken(!isTop);
+                col[i].SetPickableVisual(isTop);
             }
         }
     }
