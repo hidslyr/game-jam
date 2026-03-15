@@ -4219,6 +4219,7 @@ MonoBehaviour:
   PumpDuration: 0.4
   PumpBulgeMultiplier: 1.36
   PumpBulgeWidth: 0.15
+  PumpSphereSize: 0.2
 --- !u!4 &1957048563
 Transform:
   m_ObjectHideFlags: 0
