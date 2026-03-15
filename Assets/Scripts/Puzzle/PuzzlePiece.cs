@@ -172,7 +172,18 @@ public class PuzzlePiece : MonoBehaviour
         // VFX + SFX + destroy immediately (no delay needed)
         var matColor = meshRenderer != null ? meshRenderer.material.color : UnityEngine.Color.white;
         var vfxPos = meshRenderer != null ? meshRenderer.bounds.center : transform.position;
-        GameManager.Instance?.PlayPieceClearEffect(vfxPos, matColor);
+
+        // Screen shake only on last piece cleared
+        bool isLastPiece = true;
+        var allPieces = PuzzleBoard.Instance?.GetAllPieces();
+        if (allPieces != null)
+        {
+            foreach (var p in allPieces)
+            {
+                if (p != this && !p.IsCleared) { isLastPiece = false; break; }
+            }
+        }
+        GameManager.Instance?.PlayPieceClearEffect(vfxPos, matColor, isLastPiece);
         Destroy(gameObject);
     }
 
