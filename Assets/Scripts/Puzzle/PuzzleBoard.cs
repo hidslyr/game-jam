@@ -86,6 +86,11 @@ public class PuzzleBoard : MonoBehaviour
             var entry = data.PuzzlePieces[i];
             sortedPieces[i].Initialize(entry.Color, entry.Amount);
             pieces.Add(sortedPieces[i]);
+
+            // Set sorting priority to avoid z-fighting
+            int sortOrder = 10 - i;
+            foreach (var r in sortedPieces[i].GetComponentsInChildren<Renderer>())
+                r.sortingOrder = sortOrder;
         }
 
         // Initialize basket grid
