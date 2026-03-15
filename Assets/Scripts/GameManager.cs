@@ -55,7 +55,7 @@ public class GameManager : MonoBehaviour
     /// <summary>
     /// Play particle FX and SFX at the given position when a piece is cleared.
     /// </summary>
-    public void PlayPieceClearEffect(Vector3 position, UnityEngine.Color pieceColor)
+    public void PlayPieceClearEffect(Vector3 position, UnityEngine.Color pieceColor, bool withShake = false)
     {
         // Particle FX from VFXLibrary (prefab position used as offset)
         if (vfxLibrary != null && vfxLibrary.PieceClearFX != null)
@@ -82,8 +82,8 @@ public class GameManager : MonoBehaviour
         if (sfxLibrary != null && sfxLibrary.PieceClear != null && audioSource != null)
             audioSource.PlayOneShot(sfxLibrary.PieceClear);
 
-        // Screen shake
-        if (Camera.main != null && shakeConfig != null)
+        // Screen shake (only on last piece)
+        if (withShake && Camera.main != null && shakeConfig != null)
             Camera.main.transform.DOShakePosition(shakeConfig.Duration, shakeConfig.Intensity,
                 shakeConfig.Vibrato, shakeConfig.Randomness, false, shakeConfig.FadeOut)
                 .SetUpdate(true);
