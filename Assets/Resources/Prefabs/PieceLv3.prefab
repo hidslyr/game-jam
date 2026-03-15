@@ -572,6 +572,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PuzzlePiece
   BlendShapeTransitionDuration: 0.3
+  TextOffset: {x: 0, y: 0.04, z: 0}
 --- !u!4 &1835923997769264720 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: b8648fce1890a0d41bca8f2173480803, type: 3}
@@ -702,6 +703,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PuzzlePiece
   BlendShapeTransitionDuration: 0.3
+  TextOffset: {x: 0, y: 0.06, z: 0}
 --- !u!4 &1792749337405146158 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 20941c7be2a43c94483861a419d3d7e8, type: 3}
@@ -832,6 +834,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PuzzlePiece
   BlendShapeTransitionDuration: 0.3
+  TextOffset: {x: 0, y: 0.015, z: 0}
 --- !u!4 &3394271438886255580 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 5f2315dd9f27df745a480b009ed6e65a, type: 3}
@@ -967,6 +970,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PuzzlePiece
   BlendShapeTransitionDuration: 0.3
+  TextOffset: {x: 0, y: 0, z: 0}
 --- !u!1001 &3964492733108114060
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1097,6 +1101,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PuzzlePiece
   BlendShapeTransitionDuration: 0.3
+  TextOffset: {x: 0, y: 0, z: 0}
 --- !u!1001 &4770000768030683973
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1227,6 +1232,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PuzzlePiece
   BlendShapeTransitionDuration: 0.3
+  TextOffset: {x: 0, y: 0.04, z: 0}
 --- !u!1001 &5399334269219024383
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1352,6 +1358,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PuzzlePiece
   BlendShapeTransitionDuration: 0.3
+  TextOffset: {x: 0, y: 0.03, z: 0}
 --- !u!4 &5576846758293129748 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: e27c975bf23982948928c3f6d58390f1, type: 3}
@@ -1487,6 +1494,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PuzzlePiece
   BlendShapeTransitionDuration: 0.3
+  TextOffset: {x: 0, y: 0, z: 0}
 --- !u!1001 &6662722071545225736
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1612,6 +1620,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PuzzlePiece
   BlendShapeTransitionDuration: 0.3
+  TextOffset: {x: 0, y: 0.06, z: 0}
 --- !u!4 &6628180521600337379 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 255bbf99d7da74443bac4214a2535639, type: 3}
@@ -1747,3 +1756,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PuzzlePiece
   BlendShapeTransitionDuration: 0.3
+  TextOffset: {x: 0, y: 0, z: 0}

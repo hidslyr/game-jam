@@ -87,7 +87,7 @@ Transform:
   m_GameObject: {fileID: 514987764751857357}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.041, y: -0.174, z: -0.015}
+  m_LocalPosition: {x: 0.037, y: -0.169, z: 0.005}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -476,6 +476,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PuzzlePiece
   BlendShapeTransitionDuration: 0.3
+  TextOffset: {x: -0.6, y: 0, z: 0}
 --- !u!4 &964665784791473264 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 9053a82dd4617634b8455be9a23055f3, type: 3}
@@ -611,6 +612,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PuzzlePiece
   BlendShapeTransitionDuration: 0.3
+  TextOffset: {x: -0.5, y: 0.2, z: 0}
 --- !u!1001 &2565809347569526858
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -741,6 +743,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PuzzlePiece
   BlendShapeTransitionDuration: 0.3
+  TextOffset: {x: -0.5, y: 0.2, z: 0}
 --- !u!1001 &2615459003944769184
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -751,15 +754,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: d8e0509e68d4c5b4cbf9d0afe7fa1c58, type: 3}
       propertyPath: m_LocalScale.x
-      value: 1
+      value: 1.22
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: d8e0509e68d4c5b4cbf9d0afe7fa1c58, type: 3}
       propertyPath: m_LocalScale.y
-      value: 1
+      value: 1.22
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: d8e0509e68d4c5b4cbf9d0afe7fa1c58, type: 3}
       propertyPath: m_LocalScale.z
-      value: 1
+      value: 1.22
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: d8e0509e68d4c5b4cbf9d0afe7fa1c58, type: 3}
       propertyPath: m_LocalPosition.x
@@ -871,6 +874,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PuzzlePiece
   BlendShapeTransitionDuration: 0.3
+  TextOffset: {x: -0.5, y: 0.1, z: 0}
 --- !u!1001 &5503075990287219857
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -936,10 +940,6 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -3887185075125053422, guid: c6d039eaff8ba1542ab5ebfde9929dcb, type: 3}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: -3887185075125053422, guid: c6d039eaff8ba1542ab5ebfde9929dcb, type: 3}
       propertyPath: m_DirtyAABB
       value: 0
       objectReference: {fileID: 0}
@@ -1000,6 +1000,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PuzzlePiece
   BlendShapeTransitionDuration: 0.3
+  TextOffset: {x: -0.3, y: 0.3, z: 0}
 --- !u!4 &5464101140825217914 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: c6d039eaff8ba1542ab5ebfde9929dcb, type: 3}
@@ -1130,6 +1131,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PuzzlePiece
   BlendShapeTransitionDuration: 0.3
+  TextOffset: {x: -0.6, y: 0, z: 0}
 --- !u!4 &6809295650541413148 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: a1ba3c164e7bc4740bfdff78c7681d62, type: 3}
@@ -1265,3 +1267,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PuzzlePiece
   BlendShapeTransitionDuration: 0.3
+  TextOffset: {x: -0.5, y: 0.2, z: 0}

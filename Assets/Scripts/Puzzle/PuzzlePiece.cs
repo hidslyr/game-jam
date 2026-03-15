@@ -26,6 +26,8 @@ public class PuzzlePiece : MonoBehaviour
         ? 1f - (float)RemainingAmount / OriginalAmount
         : 0f;
 
+    public Vector3 TextOffset = Vector3.zero;
+
     Renderer meshRenderer;
     SkinnedMeshRenderer skinnedMeshRenderer;
     TextMeshPro tmpText;
@@ -56,11 +58,11 @@ public class PuzzlePiece : MonoBehaviour
         {
             var textGo = Instantiate(amountPrefab, transform);
 
-            // Position at mesh center (not pivot)
+            // Position at mesh center + offset
             if (meshRenderer != null)
-                textGo.transform.position = meshRenderer.bounds.center;
+                textGo.transform.position = meshRenderer.bounds.center + TextOffset;
             else
-                textGo.transform.localPosition = Vector3.zero;
+                textGo.transform.localPosition = TextOffset;
 
             tmpText = textGo.GetComponentInChildren<TextMeshPro>();
 
@@ -69,7 +71,7 @@ public class PuzzlePiece : MonoBehaviour
             {
                 tmpTextTransform = tmpText.transform;
                 var pos = tmpTextTransform.position;
-                tmpTextTransform.position = pos;
+                tmpTextTransform.position = pos + new Vector3(0, 0.2f, 0);
             }
         }
 
