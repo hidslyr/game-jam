@@ -558,8 +558,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4281479730
-  m_fontColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
+    rgba: 4294967295
+  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -1999,7 +1999,7 @@ Transform:
   m_GameObject: {fileID: 755564484}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.147, z: 0}
+  m_LocalPosition: {x: 0, y: 0.147, z: 1.21}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -3133,7 +3133,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1343811711
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3394,8 +3394,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4282006074
-  m_fontColor: {r: 0.2264151, g: 0.2264151, b: 0.2264151, a: 1}
+    rgba: 4294967295
+  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -4219,7 +4219,7 @@ MonoBehaviour:
   PumpDuration: 0.4
   PumpBulgeMultiplier: 1.36
   PumpBulgeWidth: 0.15
-  PumpSphereSize: 0.2
+  PumpSphereSize: 0.3
 --- !u!4 &1957048563
 Transform:
   m_ObjectHideFlags: 0
@@ -4286,7 +4286,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 16f9379f1172a408f91ac1515420b169, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MainUI
-  enableDebugUI: 1
+  enableDebugUI: 0
   debugButtonsContainer: {fileID: 664336929}
 --- !u!1 &2011471652
 GameObject:
@@ -4565,7 +4565,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 1023}
+  m_AnchoredPosition: {x: 0, y: 1118}
   m_SizeDelta: {x: 506.2388, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2109553237
@@ -4683,7 +4683,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &2134140629
 RectTransform:
   m_ObjectHideFlags: 0
